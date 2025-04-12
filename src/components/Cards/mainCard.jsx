@@ -1,8 +1,12 @@
 import { Wifi, CircleParking, Utensils, PawPrint } from "lucide-react";
+import { Link } from "react-router-dom";
 
 function MainCard({ venue }) {
     return (
-        <div className="border border-gray-200 rounded-lg shadow-sm bg-white p-4 w-full max-w-sm h-96 flex flex-col">
+        <Link
+            to={`/venues/${venue.id}`}
+            className="border border-gray-200 rounded-lg shadow-sm bg-white p-4 w-full max-w-sm h-96 flex flex-col"
+        >
             <div className="rounded-lg overflow-hidden mb-3">
                 <img
                     src={
@@ -72,7 +76,7 @@ function MainCard({ venue }) {
                     )}
                 </div>
             </div>
-        </div>
+        </Link>
     );
 }
 
