@@ -101,7 +101,7 @@ export function Header() {
                     {sortOrder === "asc" ? "Asc ↑" : "Desc ↓"}
                 </button>
 
-                {!token ? (
+                {token ? (
                     <div className="relative" ref={menuRef}>
                         <button
                             onClick={() => setMenuOpen((o) => !o)}
