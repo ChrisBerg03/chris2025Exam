@@ -150,18 +150,11 @@ export function Header() {
                 ) : (
                     <div className="flex-shrink-0">
                         <Link
-                            to="/login"
+                            to="/auth"
                             className="mr-4 px-4 py-2 text-blue-500 hover:underline"
                             aria-label="Login"
                         >
-                            Login
-                        </Link>
-                        <Link
-                            to="/register"
-                            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                            aria-label="Register"
-                        >
-                            Register
+                            Login/Register
                         </Link>
                     </div>
                 )}
