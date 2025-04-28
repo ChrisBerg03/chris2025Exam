@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import AuthForm from "../../components/Forms/auth";
 import { login } from "../../hooks/auth/Login";
 import { register } from "../../hooks/auth/Register";
+import { useNavigate } from "react-router-dom";
 
 export function Auth() {
     const [isLogin, setIsLogin] = useState(true);
@@ -15,6 +16,8 @@ export function Auth() {
         banner: { url: "", alt: "" },
         venueManager: false,
     });
+
+    const navigate = useNavigate();
 
     const handleLoginChange = (e) => {
         const { name, value } = e.target;
@@ -44,6 +47,7 @@ export function Auth() {
                     loginData.email,
                     loginData.password
                 );
+                navigate("/");
                 console.log("Login successful:", response);
             } catch (error) {
                 console.error("Login failed:", error.message);
@@ -78,6 +82,7 @@ export function Auth() {
 
                 const response = await register(filteredRegisterData);
                 console.log("Registration successful:", response);
+                setIsLogin(true);
             } catch (error) {
                 console.error("Registration failed:", error.message);
             }

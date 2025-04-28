@@ -1,8 +1,8 @@
 import { venueList } from "../../utility/constants.js";
 
-function fetchVenueList() {
+async function fetchVenueList() {
     try {
-        const response = fetch(venueList)
+        const response = await fetch(venueList)
             .then((res) => res.json())
             .then((data) => {
                 console.log(data.data);
