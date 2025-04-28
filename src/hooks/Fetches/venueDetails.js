@@ -1,8 +1,8 @@
 import { venueDetails } from "../../utility/constants.js";
 
-function fetchVenueDetails(id) {
+async function fetchVenueDetails(id) {
     try {
-        const response = fetch(`${venueDetails}/${id}`)
+        const response = await fetch(`${venueDetails}/${id}`)
             .then((res) => res.json())
             .then((data) => {
                 console.log(data.data);

@@ -16,6 +16,15 @@ export async function login(email, password) {
         }
 
         const data = await response.json();
+        console.log(data);
+
+        const user = {
+            token: data.data.accessToken,
+            profilePic: data.data.avatar.url,
+            name: data.data.name,
+        };
+
+        localStorage.setItem("user", JSON.stringify(user));
         return data;
     } catch (error) {
         console.error("Login error:", error.message);

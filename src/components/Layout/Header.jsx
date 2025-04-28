@@ -2,8 +2,15 @@ import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, useSearchParams, Link } from "react-router-dom";
 
 export function Header() {
-    const [token, setToken] = useState(null);
-    const [profilePic, setProfilePic] = useState(null);
+    const user = JSON.parse(localStorage.getItem("user"));
+    const [token, setToken] = useState(() => {
+        return user?.token || null;
+    });
+
+    const [profilePic, setProfilePic] = useState(() => {
+        return user?.profilePic || null;
+    });
+
     const [menuOpen, setMenuOpen] = useState(false);
     const [searchTerm, setSearchTerm] = useState("");
     const [sortOrder, setSortOrder] = useState("asc");
@@ -44,9 +51,9 @@ export function Header() {
     };
 
     const handleLogout = () => {
-        localStorage.removeItem("token");
-        localStorage.removeItem("profilePic");
+        localStorage.removeItem("user");
         setToken(null);
+        setProfilePic(null);
         navigate("/");
     };
 
@@ -127,7 +134,7 @@ export function Header() {
                                 <ul>
                                     <li>
                                         <Link
-                                            to="/profile"
+                                            to={`/profile/${user?.name}`}
                                             className="block px-4 py-2 hover:bg-gray-100"
                                             role="menuitem"
                                         >
