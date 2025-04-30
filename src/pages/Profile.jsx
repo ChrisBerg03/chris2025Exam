@@ -1,27 +1,25 @@
 import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import fetchProfile from "../hooks/Profile/profile";
+import { Link } from "react-router-dom";
 
 export function Profile() {
+    const { id } = useParams();
     const [profile, setProfile] = useState(null);
     const [error, setError] = useState(null);
 
     useEffect(() => {
-        const rawUser = localStorage.getItem("user");
-        if (!rawUser) return;
-
-        const user = JSON.parse(rawUser);
-        const id = user?.name;
         if (!id) return;
 
         fetchProfile(id)
             .then((data) => setProfile(data))
             .catch((err) => setError(err));
-    }, []);
+    }, [id]);
 
     if (error) return <div>Error loading profile: {error.message}</div>;
     if (!profile) return <div>Loading profile...</div>;
 
-    const { name, email, bio, avatar, banner, venueManager } = profile;
+    const { name, email, bio, avatar, banner, venueManager, venues } = profile;
 
     return (
         <div className="p-4 max-w-3xl mx-auto">
@@ -49,14 +47,35 @@ export function Profile() {
 
             {bio && <p className="mb-4">{bio}</p>}
 
-            <p className="mb-2">
+            <p className="mb-4">
                 <strong>Venue Manager:</strong> {venueManager ? "Yes" : "No"}
             </p>
 
-            {/* <p>
-                <strong>Venues:</strong> {_count.venues} &nbsp;
-                <strong>Bookings:</strong> {_count.bookings}
-            </p> */}
+            <div className="flex flex-col gap-4">
+                <h2 className="text-2xl font-semibold mb-2">My Venues</h2>
+                {venues && venues.length > 0 ? (
+                    venues.map((venue) => (
+                        <Link
+                            to={`/venues/${venue.id}`}
+                            key={venue.id}
+                            className="flex items-center gap-4 p-4 bg-white shadow rounded-lg"
+                        >
+                            {venue.media[0]?.url && (
+                                <img
+                                    src={venue.media[0].url}
+                                    alt={venue.media[0].alt || venue.name}
+                                    className="h-16 w-16 object-cover rounded"
+                                />
+                            )}
+                            <span className="text-gray-800 font-medium">
+                                {venue.name}
+                            </span>
+                        </Link>
+                    ))
+                ) : (
+                    <p className="text-gray-600">No available venues</p>
+                )}
+            </div>
         </div>
     );
 }

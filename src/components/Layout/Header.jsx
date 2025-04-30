@@ -3,14 +3,10 @@ import { useNavigate, useSearchParams, Link } from "react-router-dom";
 
 export function Header() {
     const user = JSON.parse(localStorage.getItem("user"));
-    const [token, setToken] = useState(() => {
-        return user?.token || null;
-    });
-
-    const [profilePic, setProfilePic] = useState(() => {
-        return user?.profilePic || null;
-    });
-
+    const [token, setToken] = useState(() => user?.token || null);
+    const [profilePic, setProfilePic] = useState(
+        () => user?.profilePic || null
+    );
     const [menuOpen, setMenuOpen] = useState(false);
     const [searchTerm, setSearchTerm] = useState("");
     const [sortOrder, setSortOrder] = useState("asc");
@@ -19,34 +15,23 @@ export function Header() {
     const menuRef = useRef();
 
     useEffect(() => {
-        setSearchTerm(searchParams.get("search") || "");
-        setSortOrder(searchParams.get("sort") || "asc");
+        setSearchTerm(searchParams.get("q") || "");
+        setSortOrder(searchParams.get("sortOrder") || "asc");
     }, [searchParams]);
-
-    useEffect(() => {
-        const handleClickOutside = (e) => {
-            if (menuRef.current && !menuRef.current.contains(e.target)) {
-                setMenuOpen(false);
-            }
-        };
-        document.addEventListener("mousedown", handleClickOutside);
-        return () =>
-            document.removeEventListener("mousedown", handleClickOutside);
-    }, []);
 
     const handleSearch = (e) => {
         e.preventDefault();
         const params = Object.fromEntries([...searchParams]);
-        if (searchTerm) params.search = searchTerm;
-        else delete params.search;
+        if (searchTerm) params.q = searchTerm;
+        else delete params.q;
         setSearchParams(params);
     };
 
     const toggleSort = () => {
-        const next = sortOrder === "asc" ? "desc" : "asc";
-        setSortOrder(next);
+        const nextSortOrder = sortOrder === "asc" ? "desc" : "asc";
+        setSortOrder(nextSortOrder);
         const params = Object.fromEntries([...searchParams]);
-        params.sort = next;
+        params.sortOrder = nextSortOrder;
         setSearchParams(params);
     };
 

@@ -5,7 +5,7 @@ async function fetchProfile(id) {
         const rawUser = localStorage.getItem("user");
         const token = JSON.parse(rawUser)?.token;
 
-        const response = await fetch(`${profileUrl}/${id}`, {
+        const response = await fetch(`${profileUrl}/${id}?_venues=true`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
