@@ -1,166 +1,158 @@
 import React, { useState } from "react";
 import DatePicker from "react-datepicker";
+import { Link } from "react-router-dom";
 import "react-datepicker/dist/react-datepicker.css";
 import {
     Wifi,
     CircleParking,
     Utensils,
     PawPrint,
-    ArrowLeft,
-    ArrowRight,
-    MapPinned,
+    ChevronLeft,
+    ChevronRight,
+    MapPin,
+    Star,
+    Users,
+    Calendar,
 } from "lucide-react";
 
-function DetailedCard({ venue, onBook }) {
-    const [currentImageIndex, setCurrentImageIndex] = useState(0);
-    const [dateRange, setDateRange] = useState([null, null]);
-    const [startDate, endDate] = dateRange;
+const DetailedCard = ({ venue, onBook }) => {
+    const [range, setRange] = useState([null, null]);
+    const [start, end] = range;
+    const [thumbIndex, setThumbIndex] = useState(0);
 
-    const handleNextImage = () => {
-        setCurrentImageIndex((prevIndex) =>
-            prevIndex === venue.media.length - 1 ? 0 : prevIndex + 1
-        );
-    };
+    const nextThumb = () => setThumbIndex((i) => (i + 1) % venue.media.length);
+    const prevThumb = () =>
+        setThumbIndex((i) => (i - 1 + venue.media.length) % venue.media.length);
 
-    const handlePrevImage = () => {
-        setCurrentImageIndex((prevIndex) =>
-            prevIndex === 0 ? venue.media.length - 1 : prevIndex - 1
-        );
-    };
-
-    const handleConfirm = () => {
-        if (!startDate || !endDate) {
-            alert("Please select both a start and end date before confirming.");
+    const confirmBooking = () => {
+        if (!start || !end) {
+            alert("Select both start and end dates");
             return;
         }
-        onBook(venue.id, { startDate, endDate });
+        onBook(venue.id, { startDate: start, endDate: end });
     };
 
     return (
-        <div className="border rounded-lg shadow-lg bg-white p-6 max-w-4xl mx-auto">
-            <div className="relative rounded-lg overflow-hidden mb-4">
+        <div className="max-w-3xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden flex flex-col">
+            <div className="relative h-64 bg-gray-100 flex-shrink-0">
                 <img
-                    src={
-                        venue.media[currentImageIndex]?.url?.trim() ||
-                        "https://www.svgrepo.com/show/508699/landscape-placeholder.svg"
-                    }
-                    alt={
-                        venue.media[currentImageIndex]?.alt ||
-                        "Placeholder image"
-                    }
-                    className="w-full h-64 object-cover"
+                    src={venue.media[thumbIndex]?.url}
+                    alt={venue.media[thumbIndex]?.alt}
+                    className="object-cover w-full h-full"
                 />
                 <button
-                    onClick={handlePrevImage}
-                    className="absolute top-1/2 left-4 transform -translate-y-1/2 bg-gray-800 text-white p-2 rounded-full shadow-md hover:bg-gray-700"
+                    onClick={prevThumb}
+                    className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-white p-2 rounded-full shadow hover:bg-gray-200 cursor-pointer"
                 >
-                    <ArrowLeft />
+                    <ChevronLeft />
                 </button>
                 <button
-                    onClick={handleNextImage}
-                    className="absolute top-1/2 right-4 transform -translate-y-1/2 bg-gray-800 text-white p-2 rounded-full shadow-md hover:bg-gray-700"
+                    onClick={nextThumb}
+                    className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-white p-2 rounded-full shadow hover:bg-gray-200 cursor-pointer"
                 >
-                    <ArrowRight />
+                    <ChevronRight />
                 </button>
             </div>
 
-            <h1 className="text-3xl font-bold text-gray-800 mb-4">
-                {venue.name}
-            </h1>
-            <p className="text-gray-600 mb-4">
-                {venue.description || "No description available."}
-            </p>
-
-            <div className="flex justify-between items-center text-gray-700 mb-4">
-                <p>
-                    <strong>Price:</strong> ${venue.price}
-                </p>
-                <p>
-                    <strong>Max Guests:</strong> {venue.maxGuests}
-                </p>
-                <p>
-                    <strong>Rating:</strong> {venue.rating} / 5
-                </p>
-            </div>
-
-            <div className="text-gray-700 mb-4">
-                <p className="font-bold flex items-center gap-1">
-                    <MapPinned /> Location:
-                </p>
-                <p>
-                    {venue.location.address}, {venue.location.city},{" "}
-                    {venue.location.country}
-                </p>
-            </div>
-
-            <div className="flex justify-between">
-                <div className="text-gray-700 mb-4">
-                    <h3 className="text-lg font-semibold mb-2">Facilities</h3>
-                    <div className="flex flex-wrap gap-4">
-                        {venue.meta.wifi && (
-                            <span className="flex items-center gap-1 text-sm">
-                                <Wifi className="text-gray-500" /> WiFi
-                            </span>
-                        )}
-                        {venue.meta.parking && (
-                            <span className="flex items-center gap-1 text-sm">
-                                <CircleParking className="text-gray-500" />{" "}
-                                Parking
-                            </span>
-                        )}
-                        {venue.meta.breakfast && (
-                            <span className="flex items-center gap-1 text-sm">
-                                <Utensils className="text-gray-500" /> Breakfast
-                            </span>
-                        )}
-                        {venue.meta.pets && (
-                            <span className="flex items-center gap-1 text-sm">
-                                <PawPrint className="text-gray-500" /> Pets
-                                Allowed
-                            </span>
-                        )}
+            <div className="p-6 flex flex-col gap-6">
+                <div className="flex justify-between items-center">
+                    <h2 className="text-2xl font-semibold text-gray-800">
+                        {venue.name}
+                    </h2>
+                    <div className="flex items-center text-yellow-500">
+                        <Star className="mr-1" />
+                        {venue.rating.toFixed(1)}
                     </div>
                 </div>
-                <div className="flex flex-col">
-                    <div className="text-gray-700">
-                        <h3 className="text-lg font-semibold mb-2">
-                            Select Booking Dates
-                        </h3>
-                        <DatePicker
-                            selectsRange
-                            startDate={startDate}
-                            endDate={endDate}
-                            onChange={(update) => setDateRange(update)}
-                            minDate={new Date()}
-                            placeholderText="Select a start and end date"
-                            className="border p-2 rounded w-full"
-                            inline
-                        />
-                    </div>
 
+                <p className="text-gray-600">{venue.description}</p>
+
+                <div className="flex flex-wrap gap-6 text-gray-700">
+                    <div className="flex items-center gap-2">
+                        <Calendar />
+                        <span>${venue.price} / night</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <Users />
+                        <span>Up to {venue.maxGuests} guests</span>
+                    </div>
+                </div>
+
+                <div className="flex flex-wrap gap-4 text-gray-700">
+                    {venue.meta.wifi && (
+                        <div className="flex items-center gap-1">
+                            <Wifi className="text-gray-500" />
+                            <span>WiFi</span>
+                        </div>
+                    )}
+                    {venue.meta.parking && (
+                        <div className="flex items-center gap-1">
+                            <CircleParking className="text-gray-500" />
+                            <span>Parking</span>
+                        </div>
+                    )}
+                    {venue.meta.breakfast && (
+                        <div className="flex items-center gap-1">
+                            <Utensils className="text-gray-500" />
+                            <span>Breakfast</span>
+                        </div>
+                    )}
+                    {venue.meta.pets && (
+                        <div className="flex items-center gap-1">
+                            <PawPrint className="text-gray-500" />
+                            <span>Pets Allowed</span>
+                        </div>
+                    )}
+                </div>
+
+                <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
+                    <DatePicker
+                        selectsRange
+                        startDate={start}
+                        endDate={end}
+                        onChange={(update) => setRange(update)}
+                        minDate={new Date()}
+                        inline
+                    />
                     <button
-                        onClick={handleConfirm}
-                        className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-300 cursor-pointer"
+                        onClick={confirmBooking}
+                        className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-700 transition cursor-pointer"
                     >
-                        Confirm Booking
+                        Book Now
                     </button>
                 </div>
-            </div>
-
-            <div className="mt-6">
-                <h3 className="text-lg font-semibold mb-2">Location Map</h3>
-                <iframe
-                    width="100%"
-                    height="300"
-                    style={{ border: 0 }}
-                    loading="lazy"
-                    allowFullScreen
-                    referrerPolicy="no-referrer-when-downgrade"
-                    src={`https://www.google.com/maps?q=${venue.location.lat},${venue.location.lng}&z=14&output=embed`}
-                ></iframe>
+                <Link
+                    to={`/profile/${venue.owner.name}`}
+                    className="flex items-center gap-4"
+                >
+                    <img
+                        src={venue.owner.avatar.url}
+                        alt={venue.owner.avatar.alt}
+                        className="rounded-full w-16 h-16 mb-4 object-cover"
+                    />
+                    <h3>{venue.owner.name}</h3>
+                </Link>
+                <div>
+                    <h3 className="flex items-center gap-2 text-gray-800 font-semibold mb-2">
+                        <MapPin /> Location
+                    </h3>
+                    <p className="text-gray-600">
+                        {venue.location.address}, {venue.location.city},{" "}
+                        {venue.location.country}
+                    </p>
+                    <div className="mt-2 w-full h-48">
+                        <iframe
+                            width="100%"
+                            height="200"
+                            allowFullScreen
+                            loading="lazy"
+                            src={`https://www.google.com/maps?q=${venue.location.city},${venue.location.address}&z=14&output=embed`}
+                        ></iframe>
+                    </div>
+                </div>
             </div>
         </div>
     );
-}
+};
 
 export default DetailedCard;
