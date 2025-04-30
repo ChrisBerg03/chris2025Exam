@@ -1,3 +1,6 @@
+import React, { useState } from "react";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 import {
     Wifi,
     CircleParking,
@@ -7,10 +10,11 @@ import {
     ArrowRight,
     MapPinned,
 } from "lucide-react";
-import { useState } from "react";
 
-function DetailedCard({ venue }) {
+function DetailedCard({ venue, onBook }) {
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
+    const [dateRange, setDateRange] = useState([null, null]);
+    const [startDate, endDate] = dateRange;
 
     const handleNextImage = () => {
         setCurrentImageIndex((prevIndex) =>
@@ -24,15 +28,21 @@ function DetailedCard({ venue }) {
         );
     };
 
+    const handleConfirm = () => {
+        if (!startDate || !endDate) {
+            alert("Please select both a start and end date before confirming.");
+            return;
+        }
+        onBook(venue.id, { startDate, endDate });
+    };
+
     return (
         <div className="border rounded-lg shadow-lg bg-white p-6 max-w-4xl mx-auto">
             <div className="relative rounded-lg overflow-hidden mb-4">
                 <img
                     src={
-                        venue.media[currentImageIndex]?.url &&
-                        venue.media[currentImageIndex].url.trim() !== ""
-                            ? venue.media[currentImageIndex].url
-                            : "https://www.svgrepo.com/show/508699/landscape-placeholder.svg"
+                        venue.media[currentImageIndex]?.url?.trim() ||
+                        "https://www.svgrepo.com/show/508699/landscape-placeholder.svg"
                     }
                     alt={
                         venue.media[currentImageIndex]?.alt ||
@@ -42,14 +52,13 @@ function DetailedCard({ venue }) {
                 />
                 <button
                     onClick={handlePrevImage}
-                    className="absolute top-1/2 left-4 transform -translate-y-1/2 bg-gray-800 text-white p-2 rounded-full shadow-md hover:bg-gray-700 cursor-pointer"
+                    className="absolute top-1/2 left-4 transform -translate-y-1/2 bg-gray-800 text-white p-2 rounded-full shadow-md hover:bg-gray-700"
                 >
                     <ArrowLeft />
                 </button>
-
                 <button
                     onClick={handleNextImage}
-                    className="absolute top-1/2 right-4 transform -translate-y-1/2 bg-gray-800 text-white p-2 rounded-full shadow-md hover:bg-gray-700 cursor-pointer"
+                    className="absolute top-1/2 right-4 transform -translate-y-1/2 bg-gray-800 text-white p-2 rounded-full shadow-md hover:bg-gray-700"
                 >
                     <ArrowRight />
                 </button>
@@ -84,33 +93,57 @@ function DetailedCard({ venue }) {
                 </p>
             </div>
 
-            <p className="text-gray-700 mb-4">
-                <strong>Bookings:</strong> {venue._count.bookings}
-            </p>
+            <div className="flex justify-between">
+                <div className="text-gray-700 mb-4">
+                    <h3 className="text-lg font-semibold mb-2">Facilities</h3>
+                    <div className="flex flex-wrap gap-4">
+                        {venue.meta.wifi && (
+                            <span className="flex items-center gap-1 text-sm">
+                                <Wifi className="text-gray-500" /> WiFi
+                            </span>
+                        )}
+                        {venue.meta.parking && (
+                            <span className="flex items-center gap-1 text-sm">
+                                <CircleParking className="text-gray-500" />{" "}
+                                Parking
+                            </span>
+                        )}
+                        {venue.meta.breakfast && (
+                            <span className="flex items-center gap-1 text-sm">
+                                <Utensils className="text-gray-500" /> Breakfast
+                            </span>
+                        )}
+                        {venue.meta.pets && (
+                            <span className="flex items-center gap-1 text-sm">
+                                <PawPrint className="text-gray-500" /> Pets
+                                Allowed
+                            </span>
+                        )}
+                    </div>
+                </div>
+                <div className="flex flex-col">
+                    <div className="text-gray-700">
+                        <h3 className="text-lg font-semibold mb-2">
+                            Select Booking Dates
+                        </h3>
+                        <DatePicker
+                            selectsRange
+                            startDate={startDate}
+                            endDate={endDate}
+                            onChange={(update) => setDateRange(update)}
+                            minDate={new Date()}
+                            placeholderText="Select a start and end date"
+                            className="border p-2 rounded w-full"
+                            inline
+                        />
+                    </div>
 
-            <div className="text-gray-700 mb-4">
-                <h3 className="text-lg font-semibold mb-2">Facilities</h3>
-                <div className="flex flex-wrap gap-4">
-                    {venue.meta.wifi && (
-                        <span className="flex items-center gap-1 text-sm">
-                            <Wifi className="text-gray-500" /> WiFi
-                        </span>
-                    )}
-                    {venue.meta.parking && (
-                        <span className="flex items-center gap-1 text-sm">
-                            <CircleParking className="text-gray-500" /> Parking
-                        </span>
-                    )}
-                    {venue.meta.breakfast && (
-                        <span className="flex items-center gap-1 text-sm">
-                            <Utensils className="text-gray-500" /> Breakfast
-                        </span>
-                    )}
-                    {venue.meta.pets && (
-                        <span className="flex items-center gap-1 text-sm">
-                            <PawPrint className="text-gray-500" /> Pets Allowed
-                        </span>
-                    )}
+                    <button
+                        onClick={handleConfirm}
+                        className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-300 cursor-pointer"
+                    >
+                        Confirm Booking
+                    </button>
                 </div>
             </div>
 

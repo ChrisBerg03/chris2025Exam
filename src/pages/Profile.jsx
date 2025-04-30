@@ -21,7 +21,7 @@ export function Profile() {
     if (error) return <div>Error loading profile: {error.message}</div>;
     if (!profile) return <div>Loading profile...</div>;
 
-    const { name, email, bio, avatar, banner, venueManager, _count } = profile;
+    const { name, email, bio, avatar, banner, venueManager } = profile;
 
     return (
         <div className="p-4 max-w-3xl mx-auto">
