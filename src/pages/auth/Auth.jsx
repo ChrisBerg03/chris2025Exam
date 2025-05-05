@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import AuthForm from "../../components/Forms/auth";
 import { login } from "../../hooks/auth/Login";
 import { register } from "../../hooks/auth/Register";
 import { useNavigate } from "react-router-dom";
+import { UserContext } from "../../utility/UserContext";
 
 export function Auth() {
     const [isLogin, setIsLogin] = useState(true);
@@ -17,6 +18,7 @@ export function Auth() {
         venueManager: false,
     });
 
+    const { setUser } = useContext(UserContext);
     const navigate = useNavigate();
 
     const handleLoginChange = (e) => {
@@ -47,6 +49,7 @@ export function Auth() {
                     loginData.email,
                     loginData.password
                 );
+                setUser(JSON.parse(localStorage.getItem("user")));
                 navigate("/");
                 console.log("Login successful:", response);
             } catch (error) {

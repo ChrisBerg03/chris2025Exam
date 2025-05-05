@@ -2,7 +2,9 @@ import { venueDetails } from "../../utility/constants.js";
 
 async function fetchVenueDetails(id) {
     try {
-        const response = await fetch(`${venueDetails}/${id}?_owner=true`)
+        const response = await fetch(
+            `${venueDetails}/${id}?_owner=true&_bookings=true`
+        )
             .then((res) => res.json())
             .then((data) => {
                 console.log(data.data);

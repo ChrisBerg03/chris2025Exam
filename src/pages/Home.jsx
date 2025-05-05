@@ -7,13 +7,30 @@ import MainCard from "../components/Cards/MainCard";
 export function Home() {
     const [venues, setVenues] = useState([]);
     const [page, setPage] = useState(1);
+    const [searchParams] = useSearchParams();
+
+    const query = searchParams.get("q") || "";
 
     useEffect(() => {
-        fetchVenueList(page).then(setVenues);
-    }, [page]);
+        fetchVenueList(page, query).then(setVenues);
+    }, [page, query]);
 
-    const handleNextPage = () => setPage((prev) => prev + 1);
-    const handlePreviousPage = () => setPage((prev) => Math.max(prev - 1, 1));
+    const handleNextPage = () => {
+        setPage((prev) => prev + 1);
+        scrollToTop();
+    };
+
+    const handlePreviousPage = () => {
+        setPage((prev) => Math.max(prev - 1, 1));
+        scrollToTop();
+    };
+
+    const scrollToTop = () => {
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth",
+        });
+    };
 
     return (
         <div className="p-4">

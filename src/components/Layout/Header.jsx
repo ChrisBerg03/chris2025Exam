@@ -1,18 +1,15 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useContext, useEffect, useState, useRef } from "react";
 import { useNavigate, useSearchParams, Link } from "react-router-dom";
+import { UserContext } from "../../utility/UserContext";
 
 export function Header() {
-    const user = JSON.parse(localStorage.getItem("user"));
-    const [token, setToken] = useState(() => user?.token || null);
-    const [profilePic, setProfilePic] = useState(
-        () => user?.profilePic || null
-    );
-    const [menuOpen, setMenuOpen] = useState(false);
+    const { user, setUser } = useContext(UserContext);
     const [searchTerm, setSearchTerm] = useState("");
     const [sortOrder, setSortOrder] = useState("asc");
     const [searchParams, setSearchParams] = useSearchParams();
-    const navigate = useNavigate();
+    const [menuOpen, setMenuOpen] = useState(false);
     const menuRef = useRef();
+    const navigate = useNavigate();
 
     useEffect(() => {
         setSearchTerm(searchParams.get("q") || "");
@@ -37,9 +34,8 @@ export function Header() {
 
     const handleLogout = () => {
         localStorage.removeItem("user");
-        setToken(null);
-        setProfilePic(null);
-        navigate("/");
+        setUser(null); // Clear the user context
+        navigate("/auth");
     };
 
     return (
@@ -49,15 +45,14 @@ export function Header() {
         >
             <div className="flex items-center justify-between max-w-[1600px] mx-auto p-4">
                 <div className="flex-shrink-0">
-                    <Link to="/" aria-label="Home">
+                    <Link to="/" aria-label="Home" className="h-16">
                         <img
-                            src="/logo.png"
-                            alt="Company Logo"
-                            className="h-8 w-auto"
+                            src="./src/assets/images/stay-and-trip.png"
+                            alt="Stay and trip Logo"
+                            className="h-12 w-auto"
                         />
                     </Link>
                 </div>
-
                 <form
                     onSubmit={handleSearch}
                     className="flex items-stretch flex-1 mx-4 max-w-lg"
@@ -93,7 +88,7 @@ export function Header() {
                     {sortOrder === "asc" ? "Asc ↑" : "Desc ↓"}
                 </button>
 
-                {token ? (
+                {user ? (
                     <div className="relative" ref={menuRef}>
                         <button
                             onClick={() => setMenuOpen((o) => !o)}
@@ -104,7 +99,7 @@ export function Header() {
                             aria-controls="user-menu"
                         >
                             <img
-                                src={profilePic}
+                                src={user.profilePic}
                                 alt="User Profile"
                                 className="h-8 w-8 rounded-full cursor-pointer"
                             />
@@ -119,7 +114,7 @@ export function Header() {
                                 <ul>
                                     <li>
                                         <Link
-                                            to={`/profile/${user?.name}`}
+                                            to={`/profile/${user.name}`}
                                             className="block px-4 py-2 hover:bg-gray-100"
                                             role="menuitem"
                                         >

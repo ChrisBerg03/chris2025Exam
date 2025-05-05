@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import DatePicker from "react-datepicker";
 import { Link } from "react-router-dom";
 import "react-datepicker/dist/react-datepicker.css";
@@ -20,9 +20,42 @@ const DetailedCard = ({ venue, onBook }) => {
     const [start, end] = range;
     const [thumbIndex, setThumbIndex] = useState(0);
 
+    const bookedDates = useMemo(() => {
+        const dates = [];
+        venue.bookings.forEach(({ dateFrom, dateTo }) => {
+            const curr = new Date(dateFrom);
+            const last = new Date(dateTo);
+            while (curr <= last) {
+                dates.push(new Date(curr));
+                curr.setDate(curr.getDate() + 1);
+            }
+        });
+        return dates;
+    }, [venue.bookings]);
+
+    const bookingRanges = useMemo(
+        () =>
+            venue.bookings.map(({ dateFrom, dateTo }) => ({
+                from: new Date(dateFrom),
+                to: new Date(dateTo),
+            })),
+        [venue.bookings]
+    );
+
     const nextThumb = () => setThumbIndex((i) => (i + 1) % venue.media.length);
     const prevThumb = () =>
         setThumbIndex((i) => (i - 1 + venue.media.length) % venue.media.length);
+
+    const hasOverlap = (start, end) =>
+        bookingRanges.some(({ from, to }) => start <= to && end >= from);
+
+    if (hasOverlap(start, end)) {
+        alert(
+            "The dates you selected are already booked. Please select different dates."
+        );
+        setRange([null, null]);
+        return;
+    }
 
     const confirmBooking = () => {
         if (!start || !end) {
@@ -113,7 +146,19 @@ const DetailedCard = ({ venue, onBook }) => {
                         onChange={(update) => setRange(update)}
                         minDate={new Date()}
                         inline
+                        excludeDates={bookedDates}
+                        dayClassName={(date) =>
+                            bookedDates.some(
+                                (d) =>
+                                    d.getFullYear() === date.getFullYear() &&
+                                    d.getMonth() === date.getMonth() &&
+                                    d.getDate() === date.getDate()
+                            )
+                                ? "booked-day"
+                                : undefined
+                        }
                     />
+
                     <button
                         onClick={confirmBooking}
                         className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-700 transition cursor-pointer"
