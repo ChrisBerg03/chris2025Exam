@@ -2,7 +2,7 @@ import { loginUrl } from "../../utility/constants.js";
 
 export async function login(email, password) {
     try {
-        const response = await fetch(loginUrl, {
+        const response = await fetch(`${loginUrl}?_holidaze=true`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -22,6 +22,7 @@ export async function login(email, password) {
             token: data.data.accessToken,
             profilePic: data.data.avatar.url,
             name: data.data.name,
+            venueManager: data.data.venueManager,
         };
 
         localStorage.setItem("user", JSON.stringify(user));
