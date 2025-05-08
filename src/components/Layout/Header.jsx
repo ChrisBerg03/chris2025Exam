@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useState, useRef } from "react";
 import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { UserContext } from "../../utility/UserContext";
+import logo from "../../assets/images/stay-and-trip.png";
 
 export function Header() {
     const { user, setUser } = useContext(UserContext);
@@ -10,6 +11,8 @@ export function Header() {
     const [menuOpen, setMenuOpen] = useState(false);
     const menuRef = useRef();
     const navigate = useNavigate();
+    const rawUser = localStorage.getItem("user");
+    const venueManager = JSON.parse(rawUser)?.venueManager;
 
     useEffect(() => {
         setSearchTerm(searchParams.get("q") || "");
@@ -34,7 +37,7 @@ export function Header() {
 
     const handleLogout = () => {
         localStorage.removeItem("user");
-        setUser(null); // Clear the user context
+        setUser(null);
         navigate("/auth");
     };
 
@@ -47,7 +50,7 @@ export function Header() {
                 <div className="flex-shrink-0">
                     <Link to="/" aria-label="Home" className="h-16">
                         <img
-                            src="./src/assets/images/stay-and-trip.png"
+                            src={logo}
                             alt="Stay and trip Logo"
                             className="h-12 w-auto"
                         />
@@ -121,6 +124,18 @@ export function Header() {
                                             My Profile
                                         </Link>
                                     </li>
+                                    {venueManager && (
+                                        <li>
+                                            <Link
+                                                to="/venues/createVenue"
+                                                className="w-full text-left px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                                                role="menuitem"
+                                            >
+                                                Create Listing
+                                            </Link>
+                                        </li>
+                                    )}
+
                                     <li>
                                         <button
                                             onClick={handleLogout}
