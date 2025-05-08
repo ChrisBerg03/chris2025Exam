@@ -7,6 +7,7 @@ import { Home } from "./pages/Home.jsx";
 import { VenueDetails } from "./pages/VenueDetail.jsx";
 import { Auth } from "./pages/auth/Auth.jsx";
 import { Profile } from "./pages/Profile.jsx";
+import { CreateVenue } from "./pages/createVenue.jsx";
 import "./App.css";
 
 const routes = createBrowserRouter([
@@ -21,6 +22,10 @@ const routes = createBrowserRouter([
             {
                 path: "venues/:id",
                 element: <VenueDetails />,
+            },
+            {
+                path: "venues/createVenue",
+                element: <CreateVenue />,
             },
             {
                 path: "profile/:id",
