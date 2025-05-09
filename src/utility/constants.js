@@ -4,5 +4,14 @@ const venueDetails = venueList;
 const loginUrl = baseUrl + "auth/login";
 const registerUrl = baseUrl + "auth/register";
 const profileUrl = baseUrl + "holidaze/profiles";
+const bookingUrl = baseUrl + "holidaze/bookings";
 
-export { baseUrl, venueList, venueDetails, loginUrl, registerUrl, profileUrl };
+export {
+    baseUrl,
+    venueList,
+    venueDetails,
+    loginUrl,
+    registerUrl,
+    profileUrl,
+    bookingUrl,
+};
