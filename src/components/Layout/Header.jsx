@@ -128,7 +128,7 @@ export function Header() {
                                         <li>
                                             <Link
                                                 to="/venues/createVenue"
-                                                className="w-full text-left px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                                                className="block px-4 py-2 hover:bg-gray-100"
                                                 role="menuitem"
                                             >
                                                 Create Listing

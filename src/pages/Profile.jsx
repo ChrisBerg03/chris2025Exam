@@ -19,7 +19,8 @@ export function Profile() {
     if (error) return <div>Error loading profile: {error.message}</div>;
     if (!profile) return <div>Loading profile...</div>;
 
-    const { name, email, bio, avatar, banner, venueManager, venues } = profile;
+    const { name, email, bio, avatar, banner, venueManager, venues, bookings } =
+        profile;
 
     return (
         <div className="p-4 max-w-3xl mx-auto">
@@ -50,32 +51,80 @@ export function Profile() {
             <p className="mb-4">
                 <strong>Venue Manager:</strong> {venueManager ? "Yes" : "No"}
             </p>
+            {venueManager ? (
+                <div className="flex flex-col gap-4">
+                    <h2 className="text-2xl font-semibold mb-2">My Venues</h2>
+                    {venues && venues.length > 0 ? (
+                        venues.map((venue) => (
+                            <Link
+                                to={`/venues/${venue.id}`}
+                                key={venue.id}
+                                className="flex items-center gap-4 p-4 bg-white shadow rounded-lg"
+                            >
+                                {venue.media[0]?.url && (
+                                    <img
+                                        src={venue.media[0].url}
+                                        alt={venue.media[0].alt || venue.name}
+                                        className="h-16 w-16 object-cover rounded"
+                                    />
+                                )}
+                                <span className="text-gray-800 font-medium">
+                                    {venue.name}
+                                </span>
+                            </Link>
+                        ))
+                    ) : (
+                        <p className="text-gray-600">No available venues</p>
+                    )}
+                </div>
+            ) : null}
 
-            <div className="flex flex-col gap-4">
-                <h2 className="text-2xl font-semibold mb-2">My Venues</h2>
-                {venues && venues.length > 0 ? (
-                    venues.map((venue) => (
+            {bookings && bookings.length > 0 ? (
+                <div className="flex flex-col gap-4">
+                    <h2 className="text-2xl font-semibold mb-2">
+                        Upcoming Bookings
+                    </h2>
+                    {bookings.map((booking) => (
                         <Link
-                            to={`/venues/${venue.id}`}
-                            key={venue.id}
-                            className="flex items-center gap-4 p-4 bg-white shadow rounded-lg"
+                            to={`/bookings/${booking.id}`}
+                            key={booking.id}
+                            className="flex flex-col gap-4 p-4 bg-white shadow rounded-lg"
                         >
-                            {venue.media[0]?.url && (
-                                <img
-                                    src={venue.media[0].url}
-                                    alt={venue.media[0].alt || venue.name}
-                                    className="h-16 w-16 object-cover rounded"
-                                />
-                            )}
-                            <span className="text-gray-800 font-medium">
-                                {venue.name}
-                            </span>
+                            <div className="flex items-center gap-4">
+                                {booking.venue.media[0]?.url && (
+                                    <img
+                                        src={booking.venue.media[0].url}
+                                        alt={
+                                            booking.venue.media[0].alt ||
+                                            booking.venue.name
+                                        }
+                                        className="h-16 w-16 object-cover rounded"
+                                    />
+                                )}
+                                <div>
+                                    <span className="text-gray-800 font-medium">
+                                        {booking.venue.name}
+                                    </span>
+                                    <p className="text-gray-600">
+                                        {new Date(
+                                            booking.dateFrom
+                                        ).toLocaleDateString()}{" "}
+                                        -{" "}
+                                        {new Date(
+                                            booking.dateTo
+                                        ).toLocaleDateString()}
+                                    </p>
+                                    <p className="text-gray-600">
+                                        Guests: {booking.guests}
+                                    </p>
+                                </div>
+                            </div>
                         </Link>
-                    ))
-                ) : (
-                    <p className="text-gray-600">No available venues</p>
-                )}
-            </div>
+                    ))}
+                </div>
+            ) : (
+                <p className="text-gray-600">No upcoming bookings</p>
+            )}
         </div>
     );
 }

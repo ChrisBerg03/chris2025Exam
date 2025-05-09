@@ -5,14 +5,17 @@ async function fetchProfile(id) {
         const rawUser = localStorage.getItem("user");
         const token = JSON.parse(rawUser)?.token;
 
-        const response = await fetch(`${profileUrl}/${id}?_venues=true`, {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
-                "X-Noroff-API-Key": import.meta.env.VITE_API_KEY,
-            },
-        });
+        const response = await fetch(
+            `${profileUrl}/${id}?_venues=true&_bookings=true`,
+            {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                    "X-Noroff-API-Key": import.meta.env.VITE_API_KEY,
+                },
+            }
+        );
 
         if (!response.ok) {
             throw new Error("Failed to fetch profile");
