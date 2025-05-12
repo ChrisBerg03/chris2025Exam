@@ -1,7 +1,9 @@
 import React, { useState, useMemo } from "react";
 import DatePicker from "react-datepicker";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "react-datepicker/dist/react-datepicker.css";
+import { updateVenue as updateVenueFetch } from "../../hooks/Fetches/venueEdit";
+import { deleteVenue } from "../../hooks/Fetches/venueDelete"; // Adjust path as needed
 import {
     Wifi,
     CircleParking,
@@ -13,18 +15,137 @@ import {
     Star,
     Users,
     Calendar,
+    Edit3,
+    Trash2,
 } from "lucide-react";
 
 const DetailedCard = ({ venue, onBook }) => {
+    const rawUser = localStorage.getItem("user");
+    const currentUserName = JSON.parse(rawUser || "{}").name;
+    const canEdit = currentUserName === venue.owner.name;
+    const navigate = useNavigate();
+
     const [range, setRange] = useState([null, null]);
     const [start, end] = range;
     const [thumbIndex, setThumbIndex] = useState(0);
+    const [isEditing, setIsEditing] = useState(false);
+    const [error, setError] = useState(null);
+    const [successMessage, setSuccessMessage] = useState(null);
+
+    const [editData, setEditData] = useState({
+        name: venue.name,
+        description: venue.description,
+        price: venue.price,
+        maxGuests: venue.maxGuests,
+        rating: venue.rating,
+        media: venue.media.map((m) => ({ url: m.url, alt: m.alt })),
+        meta: { ...venue.meta },
+        location: { ...venue.location },
+    });
+
+    const startEdit = () => {
+        setEditData({
+            name: venue.name,
+            description: venue.description,
+            price: venue.price,
+            maxGuests: venue.maxGuests,
+            rating: venue.rating,
+            media: venue.media.map((m) => ({ url: m.url, alt: m.alt })),
+            meta: { ...venue.meta },
+            location: { ...venue.location },
+        });
+        setIsEditing(true);
+    };
+
+    const confirmEdit = async () => {
+        const payload = {
+            name: editData.name,
+            description: editData.description,
+            media: editData.media,
+            price: Number(editData.price),
+            maxGuests: Number(editData.maxGuests),
+            rating: Math.min(5, Math.max(0, Number(editData.rating))),
+            meta: { ...editData.meta },
+            location: {
+                ...editData.location,
+                lat: Number(editData.location.lat),
+                lng: Number(editData.location.lng),
+            },
+        };
+        try {
+            await updateVenueFetch(venue.id, payload);
+            window.location.reload();
+        } catch (err) {
+            setError("Update failed: " + err.message);
+        }
+    };
+
+    const handleDelete = async () => {
+        if (
+            !window.confirm(
+                "Are you sure you want to delete this venue? This action cannot be undone."
+            )
+        ) {
+            return;
+        }
+        try {
+            await deleteVenue(venue.id);
+            setSuccessMessage("Venue deleted successfully");
+            setError(null);
+            setTimeout(() => {
+                navigate(`/profile/${currentUserName}`);
+            }, 2000); // Redirect after 2 seconds to allow user to see confirmation
+        } catch (err) {
+            setError("Failed to delete venue: " + err.message);
+            setSuccessMessage(null);
+        }
+    };
+
+    const handleChange = (field, value) => {
+        if (field === "price" || field === "maxGuests") {
+            if (value < 0) return;
+        }
+        if (field === "rating" && (value < 0 || value > 5)) return;
+        setEditData((d) => ({ ...d, [field]: value }));
+    };
+
+    const handleMetaChange = (key) =>
+        setEditData((d) => ({
+            ...d,
+            meta: { ...d.meta, [key]: !d.meta[key] },
+        }));
+
+    const handleLocationChange = (field, value) =>
+        setEditData((d) => ({
+            ...d,
+            location: { ...d.location, [field]: value },
+        }));
+
+    const handleMediaChange = (i, key, value) => {
+        const m = [...editData.media];
+        m[i][key] = value;
+        setEditData((d) => ({ ...d, media: m }));
+    };
+
+    const addMediaItem = () =>
+        setEditData((d) => ({
+            ...d,
+            media: [...d.media, { url: "", alt: "" }],
+        }));
+
+    const removeMediaItem = (i) =>
+        setEditData((d) => ({
+            ...d,
+            media: d.media.filter((_, idx) => idx !== i),
+        }));
 
     const bookedDates = useMemo(() => {
         const dates = [];
         venue.bookings.forEach(({ dateFrom, dateTo }) => {
             const curr = new Date(dateFrom);
+            curr.setHours(0, 0, 0, 0);
             const last = new Date(dateTo);
+            last.setHours(0, 0, 0, 0);
             while (curr <= last) {
                 dates.push(new Date(curr));
                 curr.setDate(curr.getDate() + 1);
@@ -35,165 +156,387 @@ const DetailedCard = ({ venue, onBook }) => {
 
     const bookingRanges = useMemo(
         () =>
-            venue.bookings.map(({ dateFrom, dateTo }) => ({
-                from: new Date(dateFrom),
-                to: new Date(dateTo),
+            venue.bookings.map((b) => ({
+                from: new Date(b.dateFrom),
+                to: new Date(b.dateTo),
             })),
         [venue.bookings]
     );
 
-    const nextThumb = () => setThumbIndex((i) => (i + 1) % venue.media.length);
-    const prevThumb = () =>
-        setThumbIndex((i) => (i - 1 + venue.media.length) % venue.media.length);
-
-    const hasOverlap = (start, end) =>
-        bookingRanges.some(({ from, to }) => start <= to && end >= from);
-
-    if (hasOverlap(start, end)) {
-        alert(
-            "The dates you selected are already booked. Please select different dates."
-        );
-        setRange([null, null]);
-        return;
-    }
+    const hasOverlap = (s, e) =>
+        bookingRanges.some(({ from, to }) => s <= to && e >= from);
 
     const confirmBooking = () => {
         if (!start || !end) {
-            alert("Select both start and end dates");
+            setError("Select both start and end dates");
+            return;
+        }
+        if (hasOverlap(start, end)) {
+            setError("Selected dates overlap with existing bookings");
             return;
         }
         onBook(venue.id, { startDate: start, endDate: end });
     };
 
     return (
-        <div className="max-w-3xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden flex flex-col">
-            <div className="relative h-64 bg-gray-100 flex-shrink-0">
+        <div className="max-w-5xl mx-auto bg-white border border-gray-200">
+            <div className="relative h-80 bg-gray-100">
                 <img
                     src={venue.media[thumbIndex]?.url}
-                    alt={venue.media[thumbIndex]?.alt}
+                    alt={venue.media[thumbIndex]?.alt || venue.name}
                     className="object-cover w-full h-full"
                 />
                 <button
-                    onClick={prevThumb}
-                    className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-white p-2 rounded-full shadow hover:bg-gray-200 cursor-pointer"
+                    onClick={() =>
+                        setThumbIndex(
+                            (i) =>
+                                (i - 1 + venue.media.length) %
+                                venue.media.length
+                        )
+                    }
+                    className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-white p-1.5 border border-gray-200 hover:bg-gray-100 cursor-pointer"
+                    aria-label="Previous image"
                 >
-                    <ChevronLeft />
+                    <ChevronLeft size={20} />
                 </button>
                 <button
-                    onClick={nextThumb}
-                    className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-white p-2 rounded-full shadow hover:bg-gray-200 cursor-pointer"
+                    onClick={() =>
+                        setThumbIndex((i) => (i + 1) % venue.media.length)
+                    }
+                    className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-white p-1.5 border border-gray-200 hover:bg-gray-100 cursor-pointer"
+                    aria-label="Next image"
                 >
-                    <ChevronRight />
+                    <ChevronRight size={20} />
                 </button>
             </div>
 
-            <div className="p-6 flex flex-col gap-6">
-                <div className="flex justify-between items-center">
-                    <h2 className="text-2xl font-semibold text-gray-800">
-                        {venue.name}
-                    </h2>
-                    <div className="flex items-center text-yellow-500">
-                        <Star className="mr-1" />
-                        {venue.rating.toFixed(1)}
+            <div className="p-6 flex flex-col lg:flex-row gap-6">
+                <div className="flex-1 space-y-6">
+                    <div className="flex justify-between items-center">
+                        {isEditing ? (
+                            <input
+                                type="text"
+                                value={editData.name}
+                                onChange={(e) =>
+                                    handleChange("name", e.target.value)
+                                }
+                                className="text-2xl font-semibold border-b border-gray-200 focus:outline-none focus:border-gray-400"
+                            />
+                        ) : (
+                            <h2 className="text-2xl font-semibold text-gray-800">
+                                {venue.name}
+                            </h2>
+                        )}
+                        <div className="flex items-center text-yellow-500">
+                            <Star size={18} className="mr-1" />
+                            {isEditing ? (
+                                <input
+                                    type="number"
+                                    value={editData.rating}
+                                    onChange={(e) =>
+                                        handleChange("rating", e.target.value)
+                                    }
+                                    min="0"
+                                    max="5"
+                                    step="0.1"
+                                    className="w-16 border-b border-gray-200 focus:outline-none focus:border-gray-400"
+                                />
+                            ) : (
+                                <span className="text-gray-800">
+                                    {venue.rating.toFixed(1)}
+                                </span>
+                            )}
+                        </div>
                     </div>
-                </div>
 
-                <p className="text-gray-600">{venue.description}</p>
-
-                <div className="flex flex-wrap gap-6 text-gray-700">
-                    <div className="flex items-center gap-2">
-                        <Calendar />
-                        <span>${venue.price} / night</span>
+                    <div className="flex gap-4 text-gray-600 text-sm">
+                        <div className="flex items-center gap-1.5">
+                            <Calendar size={16} />
+                            <span>
+                                $
+                                {isEditing ? (
+                                    <input
+                                        type="number"
+                                        value={editData.price}
+                                        onChange={(e) =>
+                                            handleChange(
+                                                "price",
+                                                e.target.value
+                                            )
+                                        }
+                                        min="0"
+                                        className="w-16 border-b border-gray-200 focus:outline-none focus:border-gray-400"
+                                    />
+                                ) : (
+                                    venue.price
+                                )}{" "}
+                                / night
+                            </span>
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                            <Users size={16} />
+                            <span>
+                                Up to{" "}
+                                {isEditing ? (
+                                    <input
+                                        type="number"
+                                        value={editData.maxGuests}
+                                        onChange={(e) =>
+                                            handleChange(
+                                                "maxGuests",
+                                                e.target.value
+                                            )
+                                        }
+                                        min="1"
+                                        className="w-16 border-b border-gray-200 focus:outline-none focus:border-gray-400"
+                                    />
+                                ) : (
+                                    venue.maxGuests
+                                )}{" "}
+                                guests
+                            </span>
+                        </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                        <Users />
-                        <span>Up to {venue.maxGuests} guests</span>
-                    </div>
-                </div>
 
-                <div className="flex flex-wrap gap-4 text-gray-700">
-                    {venue.meta.wifi && (
-                        <div className="flex items-center gap-1">
-                            <Wifi className="text-gray-500" />
-                            <span>WiFi</span>
+                    {!isEditing && (
+                        <div className="flex flex-wrap gap-4 text-gray-500 text-sm">
+                            {venue.meta.wifi && (
+                                <div className="flex items-center gap-1">
+                                    <Wifi size={16} /> Wifi
+                                </div>
+                            )}
+                            {venue.meta.parking && (
+                                <div className="flex items-center gap-1">
+                                    <CircleParking size={16} /> Parking
+                                </div>
+                            )}
+                            {venue.meta.breakfast && (
+                                <div className="flex items-center gap-1">
+                                    <Utensils size={16} /> Breakfast
+                                </div>
+                            )}
+                            {venue.meta.pets && (
+                                <div className="flex items-center gap-1">
+                                    <PawPrint size={16} /> Pets
+                                </div>
+                            )}
                         </div>
                     )}
-                    {venue.meta.parking && (
-                        <div className="flex items-center gap-1">
-                            <CircleParking className="text-gray-500" />
-                            <span>Parking</span>
-                        </div>
-                    )}
-                    {venue.meta.breakfast && (
-                        <div className="flex items-center gap-1">
-                            <Utensils className="text-gray-500" />
-                            <span>Breakfast</span>
-                        </div>
-                    )}
-                    {venue.meta.pets && (
-                        <div className="flex items-center gap-1">
-                            <PawPrint className="text-gray-500" />
-                            <span>Pets Allowed</span>
-                        </div>
-                    )}
-                </div>
 
-                <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
-                    <DatePicker
-                        selectsRange
-                        startDate={start}
-                        endDate={end}
-                        onChange={(update) => setRange(update)}
-                        minDate={new Date()}
-                        inline
-                        excludeDates={bookedDates}
-                        dayClassName={(date) =>
-                            bookedDates.some(
-                                (d) =>
-                                    d.getFullYear() === date.getFullYear() &&
-                                    d.getMonth() === date.getMonth() &&
-                                    d.getDate() === date.getDate()
-                            )
-                                ? "booked-day"
-                                : undefined
-                        }
-                    />
+                    {isEditing ? (
+                        <textarea
+                            value={editData.description}
+                            onChange={(e) =>
+                                handleChange("description", e.target.value)
+                            }
+                            className="w-full h-24 border border-gray-200 p-3 text-gray-700 focus:outline-none focus:border-gray-400"
+                        />
+                    ) : (
+                        <p className="text-gray-600 text-sm leading-relaxed">
+                            {venue.description}
+                        </p>
+                    )}
 
-                    <button
-                        onClick={confirmBooking}
-                        className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-700 transition cursor-pointer"
-                    >
-                        Book Now
-                    </button>
-                </div>
-                <Link
-                    to={`/profile/${venue.owner.name}`}
-                    className="flex items-center gap-4"
-                >
-                    <img
-                        src={venue.owner.avatar.url}
-                        alt={venue.owner.avatar.alt}
-                        className="rounded-full w-16 h-16 mb-4 object-cover"
-                    />
-                    <h3>{venue.owner.name}</h3>
-                </Link>
-                <div>
-                    <h3 className="flex items-center gap-2 text-gray-800 font-semibold mb-2">
-                        <MapPin /> Location
-                    </h3>
-                    <p className="text-gray-600">
-                        {venue.location.address}, {venue.location.city},{" "}
-                        {venue.location.country}
-                    </p>
-                    <div className="mt-2 w-full h-48">
+                    {isEditing && (
+                        <div className="space-y-2">
+                            <h3 className="text-sm font-medium text-gray-700">
+                                Media
+                            </h3>
+                            {editData.media.map((m, i) => (
+                                <div
+                                    key={i}
+                                    className="flex gap-2 items-center"
+                                >
+                                    <input
+                                        placeholder="Image URL"
+                                        value={m.url}
+                                        onChange={(e) =>
+                                            handleMediaChange(
+                                                i,
+                                                "url",
+                                                e.target.value
+                                            )
+                                        }
+                                        className="flex-1 border border-gray-200 p-2 text-sm focus:outline-none focus:border-gray-400"
+                                    />
+                                    <input
+                                        placeholder="Alt text"
+                                        value={m.alt}
+                                        onChange={(e) =>
+                                            handleMediaChange(
+                                                i,
+                                                "alt",
+                                                e.target.value
+                                            )
+                                        }
+                                        className="flex-1 border border-gray-200 p-2 text-sm focus:outline-none focus:border-gray-400"
+                                    />
+                                    <button
+                                        onClick={() => removeMediaItem(i)}
+                                        className="text-red-500 text-sm hover:text-red-600 cursor-pointer"
+                                    >
+                                        Remove
+                                    </button>
+                                </div>
+                            ))}
+                            <button
+                                onClick={addMediaItem}
+                                className="text-blue-500 text-sm hover:text-blue-600 cursor-pointer"
+                            >
+                                Add Image
+                            </button>
+                        </div>
+                    )}
+
+                    {isEditing && (
+                        <div className="space-y-2">
+                            <h3 className="text-sm font-medium text-gray-700">
+                                Amenities
+                            </h3>
+                            <div className="flex flex-wrap gap-4">
+                                {Object.keys(editData.meta).map((key) => (
+                                    <label
+                                        key={key}
+                                        className="flex items-center gap-1 text-sm text-gray-600"
+                                    >
+                                        <input
+                                            type="checkbox"
+                                            checked={editData.meta[key]}
+                                            onChange={() =>
+                                                handleMetaChange(key)
+                                            }
+                                        />
+                                        <span className="capitalize">
+                                            {key}
+                                        </span>
+                                    </label>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {isEditing ? (
+                        <div className="space-y-2">
+                            <h3 className="text-sm font-medium text-gray-700">
+                                Location
+                            </h3>
+                            {Object.entries(editData.location).map(([f, v]) => (
+                                <div key={f} className="flex flex-col">
+                                    <label className="text-xs capitalize text-gray-600">
+                                        {f}
+                                    </label>
+                                    <input
+                                        type={
+                                            f === "lat" || f === "lng"
+                                                ? "number"
+                                                : "text"
+                                        }
+                                        value={v}
+                                        onChange={(e) =>
+                                            handleLocationChange(
+                                                f,
+                                                e.target.value
+                                            )
+                                        }
+                                        className="border border-gray-200 p-2 text-sm focus:outline-none focus:border-gray-400"
+                                    />
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="flex items-start gap-2 text-sm text-gray-600">
+                            <MapPin size={16} className="mt-0.5" />
+                            <p>
+                                {venue.location.address}, {venue.location.city},{" "}
+                                {venue.location.country}
+                            </p>
+                        </div>
+                    )}
+                    <div className="mt-4 rounded-md overflow-hidden">
                         <iframe
+                            title="Venue Location"
                             width="100%"
                             height="200"
-                            allowFullScreen
                             loading="lazy"
-                            src={`https://www.google.com/maps?q=${venue.location.city},${venue.location.address}&z=14&output=embed`}
-                        ></iframe>
+                            src={`https://www.google.com/maps?q=${encodeURIComponent(
+                                `${venue.location.address}, ${venue.location.city}`
+                            )}&z=14&output=embed`}
+                        />
                     </div>
+                </div>
+
+                <div className="w-full min-w-60 max-w-60 lg:w-80 space-y-6">
+                    <div className="space-y-4 flex flex-col">
+                        <DatePicker
+                            selectsRange
+                            startDate={start}
+                            endDate={end}
+                            onChange={setRange}
+                            minDate={new Date()}
+                            inline
+                            excludeDates={bookedDates}
+                            className="border border-gray-200 w-full max-w-60"
+                        />
+                        <button
+                            onClick={confirmBooking}
+                            className="w-full max-w-60 bg-blue-500 text-white py-2 text-sm hover:bg-blue-600 transition cursor-pointer"
+                        >
+                            Book Now
+                        </button>
+                    </div>
+                    {error && (
+                        <div className="text-red-500 text-sm">{error}</div>
+                    )}
+                    {successMessage && (
+                        <div className="text-green-500 text-sm">
+                            {successMessage}
+                        </div>
+                    )}
+                    <div className="flex gap-2 flex-wrap">
+                        {isEditing ? (
+                            <>
+                                <button
+                                    onClick={confirmEdit}
+                                    className="flex-1 bg-green-500 text-white py-2 text-sm hover:bg-green-600 transition cursor-pointer"
+                                >
+                                    Save
+                                </button>
+                                <button
+                                    onClick={() => setIsEditing(false)}
+                                    className="flex-1 bg-gray-500 text-white py-2 text-sm hover:bg-gray-600 transition cursor-pointer"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    onClick={handleDelete}
+                                    className="w-full max-w-60 bg-red-500 text-white py-2 text-sm hover:bg-red-600 transition flex items-center justify-center gap-2 cursor-pointer"
+                                    aria-label="Delete venue"
+                                >
+                                    <Trash2 size={16} /> Delete
+                                </button>
+                            </>
+                        ) : (
+                            canEdit && (
+                                <button
+                                    onClick={startEdit}
+                                    className="w-full max-w-60 bg-blue-500 text-white py-2 text-sm hover:bg-blue-600 transition flex items-center justify-center gap-2 cursor-pointer"
+                                >
+                                    <Edit3 size={16} /> Edit
+                                </button>
+                            )
+                        )}
+                    </div>
+                    <Link
+                        to={`/profile/${venue.owner.name}`}
+                        className="flex items-center gap-3 text-sm text-gray-700 hover:text-gray-900"
+                    >
+                        <img
+                            src={venue.owner.avatar.url}
+                            alt={`${venue.owner.name}'s avatar`}
+                            className="rounded-full w-10 h-10 object-cover"
+                        />
+                        <span>{venue.owner.name}</span>
+                    </Link>
                 </div>
             </div>
         </div>

@@ -1,11 +1,11 @@
-import { profileUrl } from "../../utility/constants";
+import { venueList } from "../../utility/constants";
 
-export const updateProfile = async (name, data) => {
+export const updateVenue = async (id, data) => {
     const rawUser = localStorage.getItem("user");
     const token = JSON.parse(rawUser)?.token;
     if (!token) throw new Error("User is not authenticated");
 
-    const response = await fetch(`${profileUrl}/${name}`, {
+    const response = await fetch(`${venueList}/${id}`, {
         method: "PUT",
         headers: {
             "Content-Type": "application/json",
