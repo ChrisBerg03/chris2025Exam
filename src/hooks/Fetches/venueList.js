@@ -1,10 +1,7 @@
 import { venueList } from "../../utility/constants.js";
 
-async function fetchVenueList(page = 1, query = "") {
-    const params = new URLSearchParams({
-        limit: 40,
-        page,
-    });
+async function fetchVenueList(page = 1, query = "", sortOrder = "asc") {
+    const params = new URLSearchParams({ limit: 40, page, sortOrder });
 
     let url;
     if (query.trim()) {

@@ -1,7 +1,7 @@
 // src/pages/Home.jsx
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import fetchVenueList from "../hooks/Fetches/VenueList";
+import fetchVenueList from "../hooks/Fetches/venueList";
 import MainCard from "../components/Cards/MainCard";
 
 export function Home() {
@@ -10,10 +10,15 @@ export function Home() {
     const [searchParams] = useSearchParams();
 
     const query = searchParams.get("q") || "";
+    const sortOrder = searchParams.get("sortOrder") || "desc";
 
     useEffect(() => {
-        fetchVenueList(page, query).then(setVenues);
-    }, [page, query]);
+        setPage(1);
+    }, [sortOrder, query]);
+
+    useEffect(() => {
+        fetchVenueList(page, query, sortOrder).then(setVenues);
+    }, [page, query, sortOrder]);
 
     const handleNextPage = () => {
         setPage((prev) => prev + 1);
