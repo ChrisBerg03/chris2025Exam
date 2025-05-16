@@ -1,9 +1,10 @@
-import React, { useState, useMemo } from "react";
+import { useState, useMemo } from "react";
 import DatePicker from "react-datepicker";
 import { Link, useNavigate } from "react-router-dom";
 import "react-datepicker/dist/react-datepicker.css";
 import { updateVenue as updateVenueFetch } from "../../hooks/Fetches/venueEdit";
-import { deleteVenue } from "../../hooks/Fetches/venueDelete"; // Adjust path as needed
+import { deleteVenue } from "../../hooks/Fetches/venueDelete";
+import createBooking from "../../hooks/Booking/createBooking";
 import {
     Wifi,
     CircleParking,
@@ -19,18 +20,19 @@ import {
     Trash2,
 } from "lucide-react";
 
-const DetailedCard = ({ venue, onBook }) => {
+const DetailedCard = ({ venue }) => {
     const rawUser = localStorage.getItem("user");
     const currentUserName = JSON.parse(rawUser || "{}").name;
-    const canEdit = currentUserName === venue.owner.name;
+    const token = JSON.parse(rawUser || "{}").token;
     const navigate = useNavigate();
-
+    const isOwner = currentUserName === venue.owner.name;
     const [range, setRange] = useState([null, null]);
     const [start, end] = range;
     const [thumbIndex, setThumbIndex] = useState(0);
     const [isEditing, setIsEditing] = useState(false);
     const [error, setError] = useState(null);
     const [successMessage, setSuccessMessage] = useState(null);
+    const [guests, setGuests] = useState(1);
 
     const [editData, setEditData] = useState({
         name: venue.name,
@@ -94,7 +96,7 @@ const DetailedCard = ({ venue, onBook }) => {
             setError(null);
             setTimeout(() => {
                 navigate(`/profile/${currentUserName}`);
-            }, 2000); // Redirect after 2 seconds to allow user to see confirmation
+            }, 2000);
         } catch (err) {
             setError("Failed to delete venue: " + err.message);
             setSuccessMessage(null);
@@ -166,7 +168,9 @@ const DetailedCard = ({ venue, onBook }) => {
     const hasOverlap = (s, e) =>
         bookingRanges.some(({ from, to }) => s <= to && e >= from);
 
-    const confirmBooking = () => {
+    const confirmBooking = async () => {
+        setError(null);
+        setSuccessMessage(null);
         if (!start || !end) {
             setError("Select both start and end dates");
             return;
@@ -175,7 +179,28 @@ const DetailedCard = ({ venue, onBook }) => {
             setError("Selected dates overlap with existing bookings");
             return;
         }
-        onBook(venue.id, { startDate: start, endDate: end });
+        if (isOwner) {
+            setError("You cannot book your own venue.");
+            return;
+        }
+        if (guests < 1 || guests > venue.maxGuests) {
+            setError(`Guests must be between 1 and ${venue.maxGuests}`);
+            return;
+        }
+        try {
+            await createBooking({
+                dateFrom: start.toISOString(),
+                dateTo: end.toISOString(),
+                guests: Number(guests),
+                venueId: venue.id,
+            });
+            setSuccessMessage("Booking successful!");
+            setTimeout(() => {
+                navigate(`/profile/${currentUserName}`);
+            }, 2000);
+        } catch (err) {
+            setError("Booking failed: " + err.message);
+        }
     };
 
     return (
@@ -477,12 +502,43 @@ const DetailedCard = ({ venue, onBook }) => {
                             excludeDates={bookedDates}
                             className="border border-gray-200 w-full max-w-60"
                         />
-                        <button
-                            onClick={confirmBooking}
-                            className="w-full max-w-60 bg-blue-500 text-white py-2 text-sm hover:bg-blue-600 transition cursor-pointer"
-                        >
-                            Book Now
-                        </button>
+                        {token && (
+                            <div>
+                                <label
+                                    className="block text-sm text-gray-700 mb-1"
+                                    htmlFor="guests"
+                                >
+                                    Guests
+                                </label>
+                                <input
+                                    id="guests"
+                                    type="number"
+                                    min={1}
+                                    max={venue.maxGuests}
+                                    value={guests}
+                                    onChange={(e) => setGuests(e.target.value)}
+                                    className="w-full border border-gray-200 p-2 text-sm focus:outline-none focus:border-gray-400"
+                                />
+                                <span className="text-xs text-gray-500">
+                                    Max guests: {venue.maxGuests}
+                                </span>
+                            </div>
+                        )}
+
+                        {!isOwner && token && (
+                            <button
+                                onClick={confirmBooking}
+                                className="w-full max-w-60 bg-blue-500 text-white py-2 text-sm hover:bg-blue-600 transition cursor-pointer"
+                                disabled={isOwner}
+                                title={
+                                    isOwner
+                                        ? "You cannot book your own venue"
+                                        : ""
+                                }
+                            >
+                                Book Now
+                            </button>
+                        )}
                     </div>
                     {error && (
                         <div className="text-red-500 text-sm">{error}</div>
@@ -516,7 +572,7 @@ const DetailedCard = ({ venue, onBook }) => {
                                 </button>
                             </>
                         ) : (
-                            canEdit && (
+                            isOwner && (
                                 <button
                                     onClick={startEdit}
                                     className="w-full max-w-60 bg-blue-500 text-white py-2 text-sm hover:bg-blue-600 transition flex items-center justify-center gap-2 cursor-pointer"
@@ -526,17 +582,31 @@ const DetailedCard = ({ venue, onBook }) => {
                             )
                         )}
                     </div>
-                    <Link
-                        to={`/profile/${venue.owner.name}`}
-                        className="flex items-center gap-3 text-sm text-gray-700 hover:text-gray-900"
-                    >
-                        <img
-                            src={venue.owner.avatar.url}
-                            alt={`${venue.owner.name}'s avatar`}
-                            className="rounded-full w-10 h-10 object-cover"
-                        />
-                        <span>{venue.owner.name}</span>
-                    </Link>
+                    {token ? (
+                        <Link
+                            to={`/profile/${venue.owner.name}`}
+                            className="flex items-center gap-3 text-sm text-gray-700 hover:text-gray-900"
+                        >
+                            <img
+                                src={venue.owner.avatar.url}
+                                alt={`${venue.owner.name}'s avatar`}
+                                className="rounded-full w-10 h-10 object-cover"
+                            />
+                            <span>{venue.owner.name}</span>
+                        </Link>
+                    ) : (
+                        <div
+                            className="flex items-center gap-3 text-sm text-gray-400 cursor-not-allowed"
+                            aria-disabled="true"
+                        >
+                            <img
+                                src={venue.owner.avatar.url}
+                                alt={`${venue.owner.name}'s avatar`}
+                                className="rounded-full w-10 h-10 object-cover opacity-50"
+                            />
+                            <span>{venue.owner.name}</span>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>

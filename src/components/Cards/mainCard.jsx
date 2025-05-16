@@ -27,22 +27,22 @@ function MainCard({ venue }) {
                     {venue.description}
                 </p>
                 <div className="flex justify-between items-center text-gray-700 text-xs mb-2">
-                    <p>
+                    <p className="truncate">
                         <strong>Price:</strong> ${venue.price}
                     </p>
-                    <p>
+                    <p className="truncate">
                         <strong>Max Guests:</strong> {venue.maxGuests}
                     </p>
                 </div>
                 <div className="flex justify-between items-center text-gray-700 text-xs mb-2">
-                    <p>
+                    <p className="truncate">
                         <strong>Rating:</strong> {venue.rating} / 5
                     </p>
-                    <p>
+                    <p className="truncate">
                         <strong>Bookings:</strong> {venue._count.bookings}
                     </p>
                 </div>
-                <div className="text-gray-700 text-xs mb-2">
+                <div className="text-gray-700 text-xs mb-2 line-clamp-1">
                     <p className="font-bold">Location:</p>{" "}
                     {venue.location.address}, {venue.location.city},{" "}
                     {venue.location.country}
