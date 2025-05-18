@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import fetchVenueList from "../hooks/Fetches/venueList";
-import MainCard from "../components/Cards/MainCard";
+import MainCard from "../components/Cards/mainCard";
 
 export function Home() {
     const [venues, setVenues] = useState([]);
