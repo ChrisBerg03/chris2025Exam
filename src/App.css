@@ -1,1 +1,11 @@
 @import "tailwindcss";
+
+.react-datepicker__day.booked-day {
+    background-color: #d15e5a !important;
+    color: white !important;
+    pointer-events: none;
+}
+
+.react-datepicker__day.booked-day:hover {
+    background-color: #c5443f !important;
+}
