@@ -7,7 +7,7 @@ import { Home } from "./pages/Home.jsx";
 import { VenueDetails } from "./pages/VenueDetail.jsx";
 import { Auth } from "./pages/auth/Auth.jsx";
 import { Profile } from "./pages/Profile.jsx";
-import { CreateVenue } from "./pages/createVenue.jsx";
+import { CreateVenue } from "./pages/CreateVenue.jsx";
 import "./App.css";
 
 const routes = createBrowserRouter([
