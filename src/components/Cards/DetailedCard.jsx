@@ -165,6 +165,13 @@ const DetailedCard = ({ venue }) => {
         [venue.bookings]
     );
 
+    // Compute upcoming bookings
+    const upcomingBookings = useMemo(() => {
+        return venue.bookings
+            .filter((booking) => new Date(booking.dateFrom) >= new Date())
+            .sort((a, b) => new Date(a.dateFrom) - new Date(b.dateFrom));
+    }, [venue.bookings]);
+
     const hasOverlap = (s, e) =>
         bookingRanges.some(({ from, to }) => s <= to && e >= from);
 
@@ -477,6 +484,7 @@ const DetailedCard = ({ venue }) => {
                             </p>
                         </div>
                     )}
+
                     <div className="mt-4 rounded-md overflow-hidden">
                         <iframe
                             title="Venue Location"
@@ -488,6 +496,48 @@ const DetailedCard = ({ venue }) => {
                             )}&z=14&output=embed`}
                         />
                     </div>
+
+                    {/* Bookings Section */}
+                    {isOwner && (
+                        <div className="mt-6">
+                            <h3 className="text-lg font-semibold text-gray-800">
+                                Upcoming Bookings
+                            </h3>
+                            {upcomingBookings.length > 0 ? (
+                                upcomingBookings.map((booking) => (
+                                    <div
+                                        key={booking.id}
+                                        className="p-4 border border-gray-200 mt-2"
+                                    >
+                                        <p>
+                                            <strong>From:</strong>{" "}
+                                            {new Date(
+                                                booking.dateFrom
+                                            ).toLocaleDateString()}
+                                        </p>
+                                        <p>
+                                            <strong>To:</strong>{" "}
+                                            {new Date(
+                                                booking.dateTo
+                                            ).toLocaleDateString()}
+                                        </p>
+                                        <p>
+                                            <strong>Guests:</strong>{" "}
+                                            {booking.guests}
+                                        </p>
+                                        <p>
+                                            <strong>Booked by:</strong>{" "}
+                                            {booking.customer.name}
+                                        </p>
+                                    </div>
+                                ))
+                            ) : (
+                                <p className="text-gray-600">
+                                    No upcoming bookings.
+                                </p>
+                            )}
+                        </div>
+                    )}
                 </div>
 
                 <div className="w-full min-w-60 max-w-60 lg:w-80 space-y-6">
