@@ -1,12 +1,39 @@
-# React + Vite
+# 🏨 Bookings Website
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Deployment
+Vercel - https://chris2025-exam-git-main-chris-projects-614842c3.vercel.app/
 
-Currently, two official plugins are available:
+## 🚀 Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- 🔐 **Authentication**
+  - Sign up / Log in / Log out
+  - Role-based access (e.g., venue host vs. user)
+  
+- 🏠 **Venue Management**
+  - Create, update, and delete venues
+  - Upload images and set pricing
 
-## Expanding the ESLint configuration
+- 📅 **Bookings**
+  - Book venues with date selection
+  - View upcoming and past bookings
 
-If you are developing a production application, we recommend using TypeScript and enable type-aware lint rules. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- 🔍 **Search & Filters**
+  - Search venues by name or description
+  - Sort by price
+
+- 💻 **Responsive UI**
+  - Built with React + TailwindCSS
+  - Responsive for mobile and desktop
+
+---
+
+## 🧱 Tech Stack
+- **Frontend:** React, Vite, TailwindCSS, React Router
+- **Deployment:** Netlify
+
+---
+
+## 📦 Setup Instructions
+
+1. **Clone the repository**
+

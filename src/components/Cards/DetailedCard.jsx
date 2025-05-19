@@ -24,7 +24,6 @@ const DetailedCard = ({ venue }) => {
     const rawUser = localStorage.getItem("user");
     const currentUserName = JSON.parse(rawUser || "{}").name;
     const token = JSON.parse(rawUser || "{}").token;
-    const navigate = useNavigate();
     const isOwner = currentUserName === venue.owner.name;
     const [range, setRange] = useState([null, null]);
     const [start, end] = range;
@@ -33,6 +32,7 @@ const DetailedCard = ({ venue }) => {
     const [error, setError] = useState(null);
     const [successMessage, setSuccessMessage] = useState(null);
     const [guests, setGuests] = useState(1);
+    const navigate = useNavigate();
 
     const [editData, setEditData] = useState({
         name: venue.name,
