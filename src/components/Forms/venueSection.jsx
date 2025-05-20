@@ -130,7 +130,7 @@ export default function VenuesSection({ id, venues, reloadProfile }) {
                                     </span>
                                 </Link>
                                 <button
-                                    onClick={() => startEdit(v)}
+                                    onClick={() => startEdit(venue)}
                                     className="bg-blue-500 text-white px-2 py-1 rounded mr-2 flex items-center cursor-pointer"
                                 >
                                     <Edit3 size={14} />
