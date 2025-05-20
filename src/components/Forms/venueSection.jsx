@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Edit3, Trash2, Save, X } from "lucide-react";
-import { updateVenue } from "../../hooks/Fetches/venueEdit";
-import { deleteVenue } from "../../hooks/Fetches/venueDelete";
+import { updateVenue } from "../../hooks/Venue/venueEdit";
+import { deleteVenue } from "../../hooks/Venue/venueDelete";
 
 export default function VenuesSection({ id, venues, reloadProfile }) {
     const [editingId, setEditingId] = useState(null);

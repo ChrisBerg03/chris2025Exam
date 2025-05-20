@@ -2,8 +2,8 @@ import { useState, useMemo } from "react";
 import DatePicker from "react-datepicker";
 import { Link, useNavigate } from "react-router-dom";
 import "react-datepicker/dist/react-datepicker.css";
-import { updateVenue as updateVenueFetch } from "../../hooks/Fetches/venueEdit";
-import { deleteVenue } from "../../hooks/Fetches/venueDelete";
+import { updateVenue as updateVenueFetch } from "../../hooks/Venue/venueEdit";
+import { deleteVenue } from "../../hooks/Venue/venueDelete";
 import createBooking from "../../hooks/Booking/createBooking";
 import {
     Wifi,

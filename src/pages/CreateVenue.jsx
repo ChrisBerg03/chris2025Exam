@@ -1,6 +1,6 @@
 import VenueForm from "../components/Forms/createVenue";
 import { useState } from "react";
-import { createVenue } from "../hooks/Fetches/createVenue";
+import { createVenue } from "../hooks/Venue/createVenue";
 
 export function CreateVenue() {
     const [formData, setFormData] = useState({
