@@ -31,9 +31,8 @@ export default function VenueForm({
                 Create a New Venue
             </h2>
 
-            {/* Basic Info */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
+            <div className="flex flex-col md:flex-row md:space-x-6 space-y-6 md:space-y-0">
+                <div className="flex-1">
                     <label className="block text-gray-700 mb-2 font-medium">
                         Title <span className="text-red-500">*</span>
                     </label>
@@ -46,7 +45,7 @@ export default function VenueForm({
                         className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-400 transition"
                     />
                 </div>
-                <div>
+                <div className="flex-1">
                     <label className="block text-gray-700 mb-2 font-medium">
                         Price <span className="text-red-500">*</span>
                     </label>
@@ -61,7 +60,6 @@ export default function VenueForm({
                 </div>
             </div>
 
-            {/* Description */}
             <div>
                 <label className="block text-gray-700 mb-2 font-medium">
                     Description <span className="text-red-500">*</span>
@@ -76,9 +74,8 @@ export default function VenueForm({
                 />
             </div>
 
-            {/* Guests & Rating */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
+            <div className="flex flex-col md:flex-row md:space-x-6 space-y-6 md:space-y-0">
+                <div className="flex-1">
                     <label className="block text-gray-700 mb-2 font-medium">
                         Max Guests <span className="text-red-500">*</span>
                     </label>
@@ -91,7 +88,7 @@ export default function VenueForm({
                         className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-400 transition"
                     />
                 </div>
-                <div>
+                <div className="flex-1">
                     <label className="block text-gray-700 mb-2 font-medium">
                         Rating
                     </label>
@@ -108,7 +105,6 @@ export default function VenueForm({
                 </div>
             </div>
 
-            {/* Amenities */}
             <fieldset className="border-t border-gray-200 pt-6">
                 <legend className="text-lg font-medium text-gray-700">
                     Amenities
@@ -134,14 +130,13 @@ export default function VenueForm({
                 </div>
             </fieldset>
 
-            {/* Location */}
             <fieldset className="border-t border-gray-200 pt-6">
                 <legend className="text-lg font-medium text-gray-700">
                     Location
                 </legend>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4">
+                <div className="flex flex-col md:flex-row md:flex-wrap md:-mx-2 mt-4">
                     {Object.keys(formData.location).map((key) => (
-                        <div key={key}>
+                        <div key={key} className="w-full md:w-1/3 md:px-2 mb-4">
                             <label className="block text-gray-700 mb-2 capitalize font-medium">
                                 {key}
                             </label>
@@ -161,7 +156,6 @@ export default function VenueForm({
                 </div>
             </fieldset>
 
-            {/* Media with preview */}
             <fieldset className="border-t border-gray-200 pt-6">
                 <legend className="text-lg font-medium text-gray-700">
                     Media & Image Preview
@@ -169,7 +163,6 @@ export default function VenueForm({
                 <div className="space-y-6 mt-4">
                     {formData.media.map((item, index) => (
                         <div key={index} className="flex flex-col">
-                            {/* Preview */}
                             {previews[index] && (
                                 <img
                                     src={previews[index]}
@@ -196,7 +189,7 @@ export default function VenueForm({
                             <button
                                 type="button"
                                 onClick={() => removeMedia(index)}
-                                className="self-start text-red-600 hover:underline mt-2"
+                                className="self-start text-red-600 hover:underline mt-2 cursor-pointer"
                             >
                                 Remove Image
                             </button>
@@ -205,7 +198,7 @@ export default function VenueForm({
                     <button
                         type="button"
                         onClick={addMedia}
-                        className="text-indigo-600 hover:text-indigo-800 font-semibold"
+                        className="text-indigo-600 hover:text-indigo-800 font-semibold cursor-pointer"
                     >
                         + Add Another Image
                     </button>
@@ -214,7 +207,7 @@ export default function VenueForm({
 
             <button
                 type="submit"
-                className="w-full py-4 bg-indigo-600 text-white font-semibold rounded-2xl shadow-lg hover:bg-indigo-700 transition"
+                className="w-full py-4 bg-indigo-600 text-white font-semibold rounded-2xl shadow-lg hover:bg-indigo-700 transition cursor-pointer"
             >
                 Create Venue
             </button>

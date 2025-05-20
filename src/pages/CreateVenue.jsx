@@ -88,9 +88,7 @@ export function CreateVenue() {
                     lng: Number(formData.location.lng),
                 },
             };
-            console.log("Data to be sent:", submissionData);
-            const result = await createVenue(submissionData);
-            console.log("Venue created successfully:", result);
+            await createVenue(submissionData);
         } catch (error) {
             console.error("Submission error:", error);
         }

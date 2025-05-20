@@ -26,7 +26,7 @@ export default function ProfileCard({ id }) {
     const isOwner = currentUserName === profile.name;
 
     return (
-        <div className="p-6 max-w-4xl mx-auto bg-white border border-gray-200">
+        <div className="p-6 max-w-4xl mx-auto bg-white border border-gray-200 rounded-lg">
             <ProfileSection
                 profile={profile}
                 setProfile={setProfile}

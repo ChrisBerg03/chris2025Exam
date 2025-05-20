@@ -1,4 +1,5 @@
 import { loginUrl } from "../../utility/constants.js";
+import { toast } from "react-toastify";
 
 export async function login(email, password) {
     try {
@@ -11,13 +12,13 @@ export async function login(email, password) {
         });
 
         if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || "Failed to log in");
+            toast.error("Login failed, please check your credentials");
+
+            throw new Error("Failed to log in");
         }
 
         const data = await response.json();
-        console.log(data);
-
+        toast.success("Login successful!");
         const user = {
             token: data.data.accessToken,
             profilePic: data.data.avatar.url,
@@ -28,7 +29,6 @@ export async function login(email, password) {
         localStorage.setItem("user", JSON.stringify(user));
         return data;
     } catch (error) {
-        console.error("Login error:", error.message);
         throw error;
     }
 }

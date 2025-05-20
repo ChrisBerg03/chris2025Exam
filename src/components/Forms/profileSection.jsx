@@ -205,7 +205,7 @@ export default function ProfileSection({
                         </div>
                         <button
                             onClick={() => setIsEditing(true)}
-                            className="bg-blue-500 text-white p-2 rounded flex items-center cursor-pointer"
+                            className="bg-sky-500 hover:bg-sky-600 text-white p-2 rounded flex items-center cursor-pointer"
                         >
                             <Edit3 size={16} />
                         </button>

@@ -1,4 +1,5 @@
 import { bookingUrl } from "../../utility/constants";
+import { toast } from "react-toastify";
 
 export default async function deleteBooking(bookingId) {
     const rawUser = localStorage.getItem("user");
@@ -13,7 +14,13 @@ export default async function deleteBooking(bookingId) {
         },
     });
     if (!response.ok) {
+        toast.error(
+            "Failed to delete booking, please make sure the booking exists"
+        );
+
         throw new Error("Failed to delete booking");
     }
+    toast.success("Booking delted successfully!");
+
     return true;
 }

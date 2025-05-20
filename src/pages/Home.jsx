@@ -1,7 +1,7 @@
 // src/pages/Home.jsx
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import fetchVenueList from "../hooks/Venue/venueList";
+import { fetchVenueList } from "../hooks/Venue/venueList";
 import MainCard from "../components/Cards/mainCard.jsx";
 
 export function Home() {
