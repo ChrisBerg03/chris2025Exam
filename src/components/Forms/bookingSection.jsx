@@ -146,13 +146,13 @@ export default function BookingsSection({ bookings, reloadProfile }) {
                             <>
                                 <button
                                     onClick={() => startEdit(booking)}
-                                    className="bg-blue-500 text-white px-2 py-1 rounded mr-2 flex items-center cursor-pointer"
+                                    className="bg-sky-500 hover:bg-sky-600 text-white px-2 py-1 rounded mr-2 flex items-center cursor-pointer"
                                 >
                                     <Edit3 size={14} />
                                 </button>
                                 <button
                                     onClick={() => handleDelete(booking.id)}
-                                    className="bg-red-500 text-white px-2 py-1 rounded flex items-center cursor-pointer"
+                                    className="bg-rose-500 hover:bg-rose-600 text-white px-2 py-1 rounded flex items-center cursor-pointer"
                                 >
                                     <Trash2 size={14} />
                                 </button>

@@ -1,4 +1,5 @@
 import { profileUrl } from "../../utility/constants";
+import { toast } from "react-toastify";
 
 export const updateProfile = async (name, data) => {
     const rawUser = localStorage.getItem("user");
@@ -15,8 +16,8 @@ export const updateProfile = async (name, data) => {
         body: JSON.stringify(data),
     });
     if (!response.ok) {
-        const error = await response.text();
-        throw new Error(error || "Failed to update venue");
+        toast.error("Failed to update profile, please try again");
+        throw new Error("Failed to update profile");
     }
     return response.json();
 };

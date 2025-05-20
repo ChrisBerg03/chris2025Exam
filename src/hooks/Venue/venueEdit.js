@@ -1,4 +1,5 @@
 import { venueList } from "../../utility/constants";
+import { toast } from "react-toastify";
 
 export const updateVenue = async (id, data) => {
     const rawUser = localStorage.getItem("user");
@@ -15,8 +16,10 @@ export const updateVenue = async (id, data) => {
         body: JSON.stringify(data),
     });
     if (!response.ok) {
-        const error = await response.text();
-        throw new Error(error || "Failed to update venue");
+        toast.error("Failed to update venue, please try again");
+        throw new Error("Failed to update venue");
     }
+    toast.success("Venue updated successfully!");
+
     return response.json();
 };

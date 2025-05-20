@@ -3,8 +3,10 @@ import { Link } from "react-router-dom";
 import { Edit3, Trash2, Save, X } from "lucide-react";
 import { updateVenue } from "../../hooks/Venue/venueEdit";
 import { deleteVenue } from "../../hooks/Venue/venueDelete";
+import { useNavigate } from "react-router-dom";
 
-export default function VenuesSection({ id, venues, reloadProfile }) {
+export default function VenuesSection({ venues, reloadProfile }) {
+    const navigate = useNavigate();
     const [editingId, setEditingId] = useState(null);
     const [editData, setEditData] = useState({
         name: "",
@@ -12,16 +14,6 @@ export default function VenuesSection({ id, venues, reloadProfile }) {
         maxGuests: 1,
     });
     const [error, setError] = useState(null);
-
-    const startEdit = (venue) => {
-        setEditingId(venue.id);
-        setEditData({
-            name: venue.name,
-            price: venue.price,
-            maxGuests: venue.maxGuests,
-        });
-        setError(null);
-    };
 
     const saveEdit = async () => {
         try {
@@ -129,15 +121,15 @@ export default function VenuesSection({ id, venues, reloadProfile }) {
                                         {venue.name}
                                     </span>
                                 </Link>
-                                <button
-                                    onClick={() => startEdit(venue)}
-                                    className="bg-blue-500 text-white px-2 py-1 rounded mr-2 flex items-center cursor-pointer"
+                                <Link
+                                    to={`/venues/${venue.id}`}
+                                    className="bg-sky-500 hover:bg-sky-600 text-white px-2 py-1 rounded mr-2 flex items-center cursor-pointer"
                                 >
                                     <Edit3 size={14} />
-                                </button>
+                                </Link>
                                 <button
                                     onClick={() => handleDelete(venue.id)}
-                                    className="bg-red-500 text-white px-2 py-1 rounded flex items-center cursor-pointer"
+                                    className="bg-rose-500 hover:bg-rose-600 text-white px-2 py-1 rounded flex items-center cursor-pointer"
                                 >
                                     <Trash2 size={14} />
                                 </button>

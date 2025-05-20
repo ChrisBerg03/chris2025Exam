@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { UserContext } from "../../utility/UserContext";
 import logo from "../../assets/images/stay-and-trip.png";
 import { ArrowUp, ArrowDown } from "lucide-react";
+import { toast } from "react-toastify";
 
 export function Header() {
     const { user, setUser } = useContext(UserContext);
@@ -27,9 +28,8 @@ export function Header() {
             }
         };
         document.addEventListener("mousedown", handleClickOutside);
-        return () => {
+        return () =>
             document.removeEventListener("mousedown", handleClickOutside);
-        };
     }, []);
 
     const handleSearch = (e) => {
@@ -41,14 +41,16 @@ export function Header() {
     };
 
     const toggleSort = () => {
-        const nextSortOrder = sortOrder === "asc" ? "desc" : "asc";
-        setSortOrder(nextSortOrder);
-        const params = Object.fromEntries([...searchParams]);
-        params.sortOrder = nextSortOrder;
-        setSearchParams(params);
+        const next = sortOrder === "asc" ? "desc" : "asc";
+        setSortOrder(next);
+        setSearchParams({
+            ...Object.fromEntries([...searchParams]),
+            sortOrder: next,
+        });
     };
 
     const handleLogout = () => {
+        toast.success("Logged out successfully!");
         localStorage.removeItem("user");
         setUser(null);
         navigate("/auth");
@@ -56,95 +58,87 @@ export function Header() {
 
     return (
         <header
-            className="fixed top-0 w-full z-50 bg-white shadow"
+            className="fixed top-0 w-full z-50 bg-[#FAF9F6] shadow-md"
             role="banner"
         >
             <div className="flex items-center justify-between max-w-[1600px] mx-auto p-4">
-                <div className="flex-shrink-0">
-                    <Link
-                        to="/"
-                        aria-label="Home"
-                        className="flex items-center h-16"
-                    >
-                        <img
-                            src={logo}
-                            alt="Stay and trip Logo"
-                            className="h-12 w-auto"
-                        />
-                    </Link>
-                </div>
+                <Link
+                    to="/"
+                    aria-label="Home"
+                    className="flex items-center h-16"
+                >
+                    <img
+                        src={logo}
+                        alt="Stay and Trip Logo"
+                        className="h-12 w-auto"
+                    />
+                </Link>
+
                 <form
                     onSubmit={handleSearch}
-                    className="flex items-stretch flex-1 mx-4 max-w-lg shadow-sm rounded-md overflow-hidden"
+                    className="flex flex-1 mx-4 max-w-lg rounded-lg overflow-hidden shadow-lg"
                     role="search"
-                    aria-label="Site search"
                 >
                     <input
                         type="text"
-                        className="flex-grow px-4 py-2 border-0 focus:outline-none"
-                        placeholder="Search title or description..."
+                        placeholder="Search..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        aria-label="Search by title or description"
+                        className="flex-grow px-4 py-2 bg-white focus:outline-none"
                     />
                     <button
                         type="submit"
-                        className="px-4 py-2 bg-blue-500 text-white hover:bg-blue-600 cursor-pointer"
-                        aria-label="Submit search"
+                        className="px-4 py-2 bg-[#38BDF8] hover:bg-[#0EA5E9] text-white font-medium cursor-pointer"
                     >
                         Search
                     </button>
                 </form>
+
                 <button
                     onClick={toggleSort}
-                    className="mr-4 px-4 py-2 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 flex items-center gap-1"
-                    aria-label={
-                        sortOrder === "asc"
-                            ? "Sort descending"
-                            : "Sort ascending"
-                    }
+                    className="mr-4 px-4 py-2 bg-white hover:bg-[#FAF9F6] border text-gray-700 shadow-lg rounded-lg flex items-center gap-1 cursor-pointer"
+                    aria-label={`Sort ${
+                        sortOrder === "asc" ? "descending" : "ascending"
+                    }`}
                 >
                     {sortOrder === "asc" ? (
                         <ArrowUp size={16} />
                     ) : (
                         <ArrowDown size={16} />
                     )}
-                    {sortOrder === "asc" ? "Asc" : "Desc"}
+                    {sortOrder.toUpperCase()}
                 </button>
+
                 {user ? (
                     <div className="relative" ref={menuRef}>
                         <button
-                            onClick={() => setMenuOpen((o) => !o)}
-                            className={`p-0 border-0 bg-transparent hover:opacity-80 transition-opacity ${
-                                menuOpen ? "ring-2 ring-blue-500" : ""
+                            onClick={() => setMenuOpen((open) => !open)}
+                            className={`p-0 bg-transparent cursor-pointer ${
+                                menuOpen ? "ring-2 ring-[#38BDF8]" : ""
                             }`}
                             aria-haspopup="menu"
                             aria-expanded={menuOpen}
-                            aria-label="User menu"
-                            aria-controls="user-menu"
                         >
                             <img
                                 src={user.profilePic}
-                                alt="User Profile"
-                                className="h-8 w-8 rounded-full cursor-pointer"
+                                alt="Profile"
+                                className="h-8 w-8 rounded-full"
                             />
                         </button>
                         <div
                             id="user-menu"
-                            className={`absolute right-0 mt-2 w-48 bg-white border border-gray-200 shadow-lg rounded transition-opacity duration-200 ${
+                            className={`absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg transition-opacity ${
                                 menuOpen
                                     ? "opacity-100"
                                     : "opacity-0 pointer-events-none"
                             }`}
                             role="menu"
-                            aria-label="User options"
                         >
                             <ul>
                                 <li>
                                     <Link
                                         to={`/profile/${user.name}`}
-                                        className="block px-4 py-2 hover:bg-gray-100"
-                                        role="menuitem"
+                                        className="block px-4 py-2 hover:bg-[#FAF9F6]"
                                     >
                                         My Profile
                                     </Link>
@@ -153,8 +147,7 @@ export function Header() {
                                     <li>
                                         <Link
                                             to="/venues/createVenue"
-                                            className="block px-4 py-2 hover:bg-gray-100"
-                                            role="menuitem"
+                                            className="block px-4 py-2 hover:bg-[#FAF9F6]"
                                         >
                                             Create Listing
                                         </Link>
@@ -163,8 +156,7 @@ export function Header() {
                                 <li>
                                     <button
                                         onClick={handleLogout}
-                                        className="w-full text-left px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                                        role="menuitem"
+                                        className="w-full text-left px-4 py-2 hover:bg-[#FAF9F6] cursor-pointer"
                                     >
                                         Logout
                                     </button>
@@ -173,15 +165,12 @@ export function Header() {
                         </div>
                     </div>
                 ) : (
-                    <div className="flex-shrink-0">
-                        <Link
-                            to="/auth"
-                            className="mr-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                            aria-label="Login or Register"
-                        >
-                            Login / Register
-                        </Link>
-                    </div>
+                    <Link
+                        to="/auth"
+                        className="px-4 py-2 bg-[#38BDF8] hover:bg-[#0EA5E9] text-white rounded-lg cursor-pointer"
+                    >
+                        Login / Register
+                    </Link>
                 )}
             </div>
         </header>

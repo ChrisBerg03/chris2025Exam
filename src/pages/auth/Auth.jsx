@@ -51,7 +51,6 @@ export function Auth() {
                 );
                 setUser(JSON.parse(localStorage.getItem("user")));
                 navigate("/");
-                console.log("Login successful:", response);
             } catch (error) {
                 console.error("Login failed:", error.message);
             }
@@ -84,7 +83,6 @@ export function Auth() {
                 };
 
                 const response = await register(filteredRegisterData);
-                console.log("Registration successful:", response);
                 setIsLogin(true);
             } catch (error) {
                 console.error("Registration failed:", error.message);

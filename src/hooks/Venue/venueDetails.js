@@ -1,18 +1,23 @@
 import { venueDetails } from "../../utility/constants.js";
+import { toast } from "react-toastify";
 
-async function fetchVenueDetails(id) {
+export async function fetchVenueDetails(id) {
     try {
         const response = await fetch(
             `${venueDetails}/${id}?_owner=true&_bookings=true`
-        )
-            .then((res) => res.json())
-            .then((data) => {
-                console.log(data.data);
+        );
 
-                return data.data;
-            });
-        return response;
-    } catch (error) {}
+        if (!response.ok) {
+            toast.error("Failed to fetch venue, please try again");
+            setTimeout(() => {
+                window.location.href = "/";
+            }, 1000);
+            throw new Error("Failed to fetch venue");
+        }
+
+        const data = await response.json();
+        return data.data;
+    } catch (error) {
+        throw error;
+    }
 }
-
-export default fetchVenueDetails;

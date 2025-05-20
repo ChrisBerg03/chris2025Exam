@@ -1,4 +1,5 @@
 import { venueList } from "../../utility/constants";
+import { toast } from "react-toastify";
 
 export async function deleteVenue(id) {
     const rawUser = localStorage.getItem("user");
@@ -15,15 +16,13 @@ export async function deleteVenue(id) {
     });
 
     if (!response.ok) {
-        let errorMessage = "Failed to delete venue";
-        try {
-            const errorData = await response.json();
-            errorMessage = errorData.message || errorMessage;
-        } catch (jsonError) {
-            errorMessage = response.statusText || errorMessage;
-        }
+        toast.error(
+            "failed to delete venue, please make sure you have the right permissions"
+        );
+
         throw new Error(errorMessage);
     }
+    toast.success("Venue was deleted successfully!");
 
     return true;
 }
