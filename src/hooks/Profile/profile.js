@@ -1,4 +1,5 @@
 import { profileUrl } from "../../utility/constants.js";
+import { toast } from "react-toastify";
 
 async function fetchProfile(id) {
     try {
@@ -18,11 +19,14 @@ async function fetchProfile(id) {
         );
 
         if (!response.ok) {
+            toast.error(
+                "Failed to fetch profile, please try again. make sure you are logged in"
+            );
+
             throw new Error("Failed to fetch profile");
         }
 
         const data = await response.json();
-        console.log(data.data);
 
         return data.data;
     } catch (error) {

@@ -1,9 +1,8 @@
 import { registerUrl } from "../../utility/constants.js";
+import { toast } from "react-toastify";
 
 export async function register(registerData) {
     try {
-        console.log(registerData);
-
         const response = await fetch(registerUrl, {
             method: "POST",
             headers: {
@@ -13,11 +12,17 @@ export async function register(registerData) {
         });
 
         if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || "Failed to register");
+            toast.error(
+                "Registration failed, make sure all fields are filled in correctly"
+            );
+            throw new Error("Failed to register");
         }
 
         const data = await response.json();
+        toast.success("Registration successful!").then(() => {
+            window.location.reload();
+        });
+
         return data;
     } catch (error) {
         console.error("Register error:", error.message);

@@ -1,29 +1,25 @@
 import { venueList } from "../../utility/constants";
+import { toast } from "react-toastify";
 
-export async function deleteVenue(id) {
+export const updateVenue = async (id, data) => {
     const rawUser = localStorage.getItem("user");
     const token = JSON.parse(rawUser)?.token;
     if (!token) throw new Error("User is not authenticated");
 
     const response = await fetch(`${venueList}/${id}`, {
-        method: "DELETE",
+        method: "PUT",
         headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
             "X-Noroff-API-Key": import.meta.env.VITE_API_KEY,
         },
+        body: JSON.stringify(data),
     });
-
     if (!response.ok) {
-        let errorMessage = "Failed to delete venue";
-        try {
-            const errorData = await response.json();
-            errorMessage = errorData.message || errorMessage;
-        } catch (jsonError) {
-            errorMessage = response.statusText || errorMessage;
-        }
-        throw new Error(errorMessage);
+        toast.error("Failed to update venue, please try again");
+        throw new Error("Failed to update venue");
     }
+    toast.success("Venue updated successfully!");
 
-    return true;
-}
+    return response.json();
+};

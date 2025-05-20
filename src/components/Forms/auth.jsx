@@ -42,7 +42,7 @@ function AuthForm({
                     </label>
                     <button
                         type="submit"
-                        className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 cursor-pointer"
+                        className="w-full bg-sky-500 text-white py-2 rounded hover:bg-sky-600 cursor-pointer"
                     >
                         Login
                     </button>
@@ -51,7 +51,7 @@ function AuthForm({
                         <button
                             type="button"
                             onClick={() => setIsLogin(false)}
-                            className="text-blue-500 hover:underline cursor-pointer"
+                            className="text-sky-500 hover:underline cursor-pointer"
                         >
                             Register
                         </button>
@@ -164,7 +164,7 @@ function AuthForm({
                         <button
                             type="button"
                             onClick={() => setIsLogin(true)}
-                            className="text-blue-500 hover:underline cursor-pointer"
+                            className="text-sky-500 hover:underline cursor-pointer"
                         >
                             Login
                         </button>

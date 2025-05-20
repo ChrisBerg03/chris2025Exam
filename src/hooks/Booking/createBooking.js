@@ -1,4 +1,5 @@
 import { bookingUrl } from "../../utility/constants";
+import { toast } from "react-toastify";
 
 async function createBooking({ dateFrom, dateTo, guests, venueId }) {
     try {
@@ -21,10 +22,16 @@ async function createBooking({ dateFrom, dateTo, guests, venueId }) {
         });
 
         if (!response.ok) {
+            toast.error(
+                "booking failed, please check the details and try again"
+            );
+
             throw new Error("Failed to create booking");
         }
 
         const data = await response.json();
+        toast.success("Booking was successful!");
+
         return data;
     } catch (error) {
         console.error("Error creating booking:", error);

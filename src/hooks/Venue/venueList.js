@@ -1,6 +1,7 @@
 import { venueList } from "../../utility/constants.js";
+import { toast } from "react-toastify";
 
-async function fetchVenueList(page = 1, query = "", sortOrder = "asc") {
+export async function fetchVenueList(page = 1, query = "", sortOrder = "asc") {
     const params = new URLSearchParams({ limit: 40, page, sortOrder });
 
     let url;
@@ -15,18 +16,16 @@ async function fetchVenueList(page = 1, query = "", sortOrder = "asc") {
         const response = await fetch(url);
 
         if (!response.ok) {
+            toast.error("Failed to fetch venues, please try again");
             throw new Error(
                 `Failed to fetch venues (status ${response.status})`
             );
         }
 
-        const json = await response.json();
-        console.log(json.data);
-        return json.data;
+        const data = await response.json();
+        return data.data;
     } catch (error) {
         console.error("Error fetching venue list:", error.message);
         throw error;
     }
 }
-
-export default fetchVenueList;

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import fetchVenueDetails from "../hooks/Fetches/venueDetails.js";
+import { fetchVenueDetails } from "../hooks/Venue/venueDetails.js";
 import DetailedCard from "../components/Cards/DetailedCard.jsx";
 
 export function VenueDetails() {

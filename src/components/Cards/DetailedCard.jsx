@@ -2,8 +2,8 @@ import { useState, useMemo } from "react";
 import DatePicker from "react-datepicker";
 import { Link, useNavigate } from "react-router-dom";
 import "react-datepicker/dist/react-datepicker.css";
-import { updateVenue as updateVenueFetch } from "../../hooks/Fetches/venueEdit";
-import { deleteVenue } from "../../hooks/Fetches/venueDelete";
+import { updateVenue as updateVenueFetch } from "../../hooks/Venue/venueEdit";
+import { deleteVenue } from "../../hooks/Venue/venueDelete";
 import createBooking from "../../hooks/Booking/createBooking";
 import {
     Wifi,
@@ -24,7 +24,6 @@ const DetailedCard = ({ venue }) => {
     const rawUser = localStorage.getItem("user");
     const currentUserName = JSON.parse(rawUser || "{}").name;
     const token = JSON.parse(rawUser || "{}").token;
-    const navigate = useNavigate();
     const isOwner = currentUserName === venue.owner.name;
     const [range, setRange] = useState([null, null]);
     const [start, end] = range;
@@ -33,6 +32,7 @@ const DetailedCard = ({ venue }) => {
     const [error, setError] = useState(null);
     const [successMessage, setSuccessMessage] = useState(null);
     const [guests, setGuests] = useState(1);
+    const navigate = useNavigate();
 
     const [editData, setEditData] = useState({
         name: venue.name,
@@ -165,7 +165,6 @@ const DetailedCard = ({ venue }) => {
         [venue.bookings]
     );
 
-    // Compute upcoming bookings
     const upcomingBookings = useMemo(() => {
         return venue.bookings
             .filter((booking) => new Date(booking.dateFrom) >= new Date())
@@ -266,16 +265,19 @@ const DetailedCard = ({ venue }) => {
                                     type="number"
                                     value={editData.rating}
                                     onChange={(e) =>
-                                        handleChange("rating", e.target.value)
+                                        handleChange(
+                                            "rating",
+                                            parseInt(e.target.value, 10)
+                                        )
                                     }
-                                    min="0"
-                                    max="5"
-                                    step="0.1"
+                                    min={0}
+                                    max={5}
+                                    step={1}
                                     className="w-16 border-b border-gray-200 focus:outline-none focus:border-gray-400"
                                 />
                             ) : (
                                 <span className="text-gray-800">
-                                    {venue.rating.toFixed(1)}
+                                    {Math.min(5, Math.round(venue.rating))}{" "}
                                 </span>
                             )}
                         </div>
@@ -405,7 +407,7 @@ const DetailedCard = ({ venue }) => {
                                     />
                                     <button
                                         onClick={() => removeMediaItem(i)}
-                                        className="text-red-500 text-sm hover:text-red-600 cursor-pointer"
+                                        className="text-rose-500 text-sm hover:text-rose-600 cursor-pointer"
                                     >
                                         Remove
                                     </button>
@@ -413,7 +415,7 @@ const DetailedCard = ({ venue }) => {
                             ))}
                             <button
                                 onClick={addMediaItem}
-                                className="text-blue-500 text-sm hover:text-blue-600 cursor-pointer"
+                                className="text-sky-500 text-sm hover:text-sky-600 cursor-pointer"
                             >
                                 Add Image
                             </button>
@@ -497,7 +499,6 @@ const DetailedCard = ({ venue }) => {
                         />
                     </div>
 
-                    {/* Bookings Section */}
                     {isOwner && (
                         <div className="mt-6">
                             <h3 className="text-lg font-semibold text-gray-800">
@@ -552,7 +553,7 @@ const DetailedCard = ({ venue }) => {
                             excludeDates={bookedDates}
                             className="border border-gray-200 w-full max-w-60"
                         />
-                        {token && (
+                        {!isOwner && token && (
                             <div>
                                 <label
                                     className="block text-sm text-gray-700 mb-1"
@@ -572,26 +573,19 @@ const DetailedCard = ({ venue }) => {
                                 <span className="text-xs text-gray-500">
                                     Max guests: {venue.maxGuests}
                                 </span>
-                            </div>
-                        )}
 
-                        {!isOwner && token && (
-                            <button
-                                onClick={confirmBooking}
-                                className="w-full max-w-60 bg-blue-500 text-white py-2 text-sm hover:bg-blue-600 transition cursor-pointer"
-                                disabled={isOwner}
-                                title={
-                                    isOwner
-                                        ? "You cannot book your own venue"
-                                        : ""
-                                }
-                            >
-                                Book Now
-                            </button>
+                                <button
+                                    onClick={confirmBooking}
+                                    className="w-full max-w-60 mt-4 bg-sky-500 text-white py-2 text-sm hover:bg-sky-600 transition cursor-pointer"
+                                    title="Book this venue"
+                                >
+                                    Book Now
+                                </button>
+                            </div>
                         )}
                     </div>
                     {error && (
-                        <div className="text-red-500 text-sm">{error}</div>
+                        <div className="text-rose-500 text-sm">{error}</div>
                     )}
                     {successMessage && (
                         <div className="text-green-500 text-sm">
@@ -615,7 +609,7 @@ const DetailedCard = ({ venue }) => {
                                 </button>
                                 <button
                                     onClick={handleDelete}
-                                    className="w-full max-w-60 bg-red-500 text-white py-2 text-sm hover:bg-red-600 transition flex items-center justify-center gap-2 cursor-pointer"
+                                    className="w-full max-w-60 bg-rose-500 text-white py-2 text-sm hover:bg-rose-600 transition flex items-center justify-center gap-2 cursor-pointer"
                                     aria-label="Delete venue"
                                 >
                                     <Trash2 size={16} /> Delete
@@ -625,7 +619,7 @@ const DetailedCard = ({ venue }) => {
                             isOwner && (
                                 <button
                                     onClick={startEdit}
-                                    className="w-full max-w-60 bg-blue-500 text-white py-2 text-sm hover:bg-blue-600 transition flex items-center justify-center gap-2 cursor-pointer"
+                                    className="w-full max-w-60 bg-sky-500 text-white py-2 text-sm hover:bg-sky-600 transition flex items-center justify-center gap-2 cursor-pointer"
                                 >
                                     <Edit3 size={16} /> Edit
                                 </button>
