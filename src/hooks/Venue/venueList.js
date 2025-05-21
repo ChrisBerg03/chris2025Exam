@@ -2,7 +2,12 @@ import { venueList } from "../../utility/constants.js";
 import { toast } from "react-toastify";
 
 export async function fetchVenueList(page = 1, query = "", sortOrder = "asc") {
-    const params = new URLSearchParams({ limit: 40, page, sortOrder });
+    const params = new URLSearchParams({
+        limit: 40,
+        page,
+        sortOrder,
+        sort: "price",
+    });
 
     let url;
     if (query.trim()) {
