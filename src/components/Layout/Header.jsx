@@ -120,12 +120,9 @@ export function Header() {
                         ) : (
                             <Link
                                 to="/auth"
-                                className="p-2 bg-[#38BDF8] rounded-full"
+                                className="px-4 py-2 bg-[#38BDF8] hover:bg-[#0EA5E9] text-white rounded-lg cursor-pointer"
                             >
-                                <span className="sr-only">
-                                    Login / Register
-                                </span>
-                                <SearchIcon size={20} />
+                                Login
                             </Link>
                         )}
                     </div>
@@ -255,9 +252,9 @@ export function Header() {
                         />
                         <button
                             type="submit"
-                            className="px-4 py-2 bg-[#38BDF8] hover:bg-[#0EA5E9] text-white cursor-pointer"
+                            className=" px-4 py-2 bg-[#38BDF8] hover:bg-[#0EA5E9] text-white cursor-pointer"
                         >
-                            Go
+                            Search
                         </button>
                     </form>
                 </div>

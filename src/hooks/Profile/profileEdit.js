@@ -17,7 +17,9 @@ export const updateProfile = async (name, data) => {
     });
     if (!response.ok) {
         toast.error("Failed to update profile, please try again");
+        window.location.href = "/";
         throw new Error("Failed to update profile");
     }
+    toast.success("Profile updated successfully");
     return response.json();
 };
