@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useReducer } from "react";
 import DatePicker from "react-datepicker";
 import { Link, useNavigate } from "react-router-dom";
 import "react-datepicker/dist/react-datepicker.css";
@@ -20,10 +20,31 @@ import {
     Trash2,
 } from "lucide-react";
 
+const EditInput = ({
+    label,
+    type = "text",
+    value,
+    onChange,
+    className = "",
+    ...props
+}) => (
+    <div className="flex flex-col">
+        {label && (
+            <label className="text-xs capitalize text-gray-600">{label}</label>
+        )}
+        <input
+            type={type}
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            className={`border border-gray-200 p-2 text-sm focus:outline-none focus:border-gray-400 ${className}`}
+            {...props}
+        />
+    </div>
+);
+
 const DetailedCard = ({ venue }) => {
     const rawUser = localStorage.getItem("user");
-    const currentUserName = JSON.parse(rawUser || "{}").name;
-    const token = JSON.parse(rawUser || "{}").token;
+    const { name: currentUserName, token } = JSON.parse(rawUser || "{}");
     const isOwner = currentUserName === venue.owner.name;
     const [range, setRange] = useState([null, null]);
     const [start, end] = range;
@@ -34,7 +55,7 @@ const DetailedCard = ({ venue }) => {
     const [guests, setGuests] = useState(1);
     const navigate = useNavigate();
 
-    const [editData, setEditData] = useState({
+    const initialEditState = {
         name: venue.name,
         description: venue.description,
         price: venue.price,
@@ -43,19 +64,50 @@ const DetailedCard = ({ venue }) => {
         media: venue.media.map((m) => ({ url: m.url, alt: m.alt })),
         meta: { ...venue.meta },
         location: { ...venue.location },
-    });
+    };
+
+    const editReducer = (state, action) => {
+        switch (action.type) {
+            case "UPDATE_FIELD":
+                return { ...state, [action.field]: action.value };
+            case "UPDATE_META":
+                return {
+                    ...state,
+                    meta: { ...state.meta, [action.key]: action.value },
+                };
+            case "UPDATE_LOCATION":
+                return {
+                    ...state,
+                    location: {
+                        ...state.location,
+                        [action.field]: action.value,
+                    },
+                };
+            case "UPDATE_MEDIA":
+                const media = [...state.media];
+                media[action.index][action.key] = action.value;
+                return { ...state, media };
+            case "ADD_MEDIA":
+                return {
+                    ...state,
+                    media: [...state.media, { url: "", alt: "" }],
+                };
+            case "REMOVE_MEDIA":
+                return {
+                    ...state,
+                    media: state.media.filter((_, i) => i !== action.index),
+                };
+            case "RESET":
+                return initialEditState;
+            default:
+                return state;
+        }
+    };
+
+    const [editData, dispatch] = useReducer(editReducer, initialEditState);
 
     const startEdit = () => {
-        setEditData({
-            name: venue.name,
-            description: venue.description,
-            price: venue.price,
-            maxGuests: venue.maxGuests,
-            rating: venue.rating,
-            media: venue.media.map((m) => ({ url: m.url, alt: m.alt })),
-            meta: { ...venue.meta },
-            location: { ...venue.location },
-        });
+        dispatch({ type: "RESET" });
         setIsEditing(true);
     };
 
@@ -87,59 +139,29 @@ const DetailedCard = ({ venue }) => {
             !window.confirm(
                 "Are you sure you want to delete this venue? This action cannot be undone."
             )
-        ) {
+        )
             return;
-        }
         try {
             await deleteVenue(venue.id);
             setSuccessMessage("Venue deleted successfully");
             setError(null);
-            setTimeout(() => {
-                navigate(`/profile/${currentUserName}`);
-            }, 2000);
+            setTimeout(() => navigate(`/profile/${currentUserName}`), 2000);
         } catch (err) {
             setError("Failed to delete venue: " + err.message);
             setSuccessMessage(null);
         }
     };
 
-    const handleChange = (field, value) => {
-        if (field === "price" || field === "maxGuests") {
-            if (value < 0) return;
-        }
-        if (field === "rating" && (value < 0 || value > 5)) return;
-        setEditData((d) => ({ ...d, [field]: value }));
-    };
+    const totalNights = useMemo(() => {
+        if (!start || !end) return 0;
+        const diff = (end - start) / (1000 * 60 * 60 * 24);
+        return Math.max(0, Math.ceil(diff));
+    }, [start, end]);
 
-    const handleMetaChange = (key) =>
-        setEditData((d) => ({
-            ...d,
-            meta: { ...d.meta, [key]: !d.meta[key] },
-        }));
-
-    const handleLocationChange = (field, value) =>
-        setEditData((d) => ({
-            ...d,
-            location: { ...d.location, [field]: value },
-        }));
-
-    const handleMediaChange = (i, key, value) => {
-        const m = [...editData.media];
-        m[i][key] = value;
-        setEditData((d) => ({ ...d, media: m }));
-    };
-
-    const addMediaItem = () =>
-        setEditData((d) => ({
-            ...d,
-            media: [...d.media, { url: "", alt: "" }],
-        }));
-
-    const removeMediaItem = (i) =>
-        setEditData((d) => ({
-            ...d,
-            media: d.media.filter((_, idx) => idx !== i),
-        }));
+    const totalPrice = useMemo(
+        () => totalNights * venue.price,
+        [totalNights, venue.price]
+    );
 
     const bookedDates = useMemo(() => {
         const dates = [];
@@ -201,9 +223,7 @@ const DetailedCard = ({ venue }) => {
                 venueId: venue.id,
             });
             setSuccessMessage("Booking successful!");
-            setTimeout(() => {
-                navigate(`/profile/${currentUserName}`);
-            }, 2000);
+            setTimeout(() => navigate(`/profile/${currentUserName}`), 2000);
         } catch (err) {
             setError("Booking failed: " + err.message);
         }
@@ -245,13 +265,16 @@ const DetailedCard = ({ venue }) => {
                 <div className="flex-1 space-y-6">
                     <div className="flex justify-between items-center">
                         {isEditing ? (
-                            <input
-                                type="text"
+                            <EditInput
                                 value={editData.name}
-                                onChange={(e) =>
-                                    handleChange("name", e.target.value)
+                                onChange={(value) =>
+                                    dispatch({
+                                        type: "UPDATE_FIELD",
+                                        field: "name",
+                                        value,
+                                    })
                                 }
-                                className="text-2xl font-semibold border-b border-gray-200 focus:outline-none focus:border-gray-400"
+                                className="text-2xl font-semibold"
                             />
                         ) : (
                             <h2 className="text-2xl font-semibold text-gray-800">
@@ -261,23 +284,24 @@ const DetailedCard = ({ venue }) => {
                         <div className="flex items-center text-yellow-500">
                             <Star size={18} className="mr-1" />
                             {isEditing ? (
-                                <input
+                                <EditInput
                                     type="number"
                                     value={editData.rating}
-                                    onChange={(e) =>
-                                        handleChange(
-                                            "rating",
-                                            parseInt(e.target.value, 10)
-                                        )
+                                    onChange={(value) =>
+                                        dispatch({
+                                            type: "UPDATE_FIELD",
+                                            field: "rating",
+                                            value,
+                                        })
                                     }
                                     min={0}
                                     max={5}
                                     step={1}
-                                    className="w-16 border-b border-gray-200 focus:outline-none focus:border-gray-400"
+                                    className="w-16"
                                 />
                             ) : (
                                 <span className="text-gray-800">
-                                    {Math.min(5, Math.round(venue.rating))}{" "}
+                                    {Math.min(5, Math.round(venue.rating))}
                                 </span>
                             )}
                         </div>
@@ -287,19 +311,20 @@ const DetailedCard = ({ venue }) => {
                         <div className="flex items-center gap-1.5">
                             <Calendar size={16} />
                             <span>
-                                $
+                                Nok{" "}
                                 {isEditing ? (
-                                    <input
+                                    <EditInput
                                         type="number"
                                         value={editData.price}
-                                        onChange={(e) =>
-                                            handleChange(
-                                                "price",
-                                                e.target.value
-                                            )
+                                        onChange={(value) =>
+                                            dispatch({
+                                                type: "UPDATE_FIELD",
+                                                field: "price",
+                                                value,
+                                            })
                                         }
                                         min="0"
-                                        className="w-16 border-b border-gray-200 focus:outline-none focus:border-gray-400"
+                                        className="w-16 inline-block"
                                     />
                                 ) : (
                                     venue.price
@@ -312,17 +337,18 @@ const DetailedCard = ({ venue }) => {
                             <span>
                                 Up to{" "}
                                 {isEditing ? (
-                                    <input
+                                    <EditInput
                                         type="number"
                                         value={editData.maxGuests}
-                                        onChange={(e) =>
-                                            handleChange(
-                                                "maxGuests",
-                                                e.target.value
-                                            )
+                                        onChange={(value) =>
+                                            dispatch({
+                                                type: "UPDATE_FIELD",
+                                                field: "maxGuests",
+                                                value,
+                                            })
                                         }
                                         min="1"
-                                        className="w-16 border-b border-gray-200 focus:outline-none focus:border-gray-400"
+                                        className="w-16 inline-block"
                                     />
                                 ) : (
                                     venue.maxGuests
@@ -361,12 +387,16 @@ const DetailedCard = ({ venue }) => {
                         <textarea
                             value={editData.description}
                             onChange={(e) =>
-                                handleChange("description", e.target.value)
+                                dispatch({
+                                    type: "UPDATE_FIELD",
+                                    field: "description",
+                                    value: e.target.value,
+                                })
                             }
                             className="w-full h-24 border border-gray-200 p-3 text-gray-700 focus:outline-none focus:border-gray-400"
                         />
                     ) : (
-                        <p className="text-gray-600 text-sm leading-relaxed">
+                        <p className="text-gray-600 text-sm leading-relaxed truncate">
                             {venue.description}
                         </p>
                     )}
@@ -381,32 +411,39 @@ const DetailedCard = ({ venue }) => {
                                     key={i}
                                     className="flex gap-2 items-center"
                                 >
-                                    <input
+                                    <EditInput
                                         placeholder="Image URL"
                                         value={m.url}
-                                        onChange={(e) =>
-                                            handleMediaChange(
-                                                i,
-                                                "url",
-                                                e.target.value
-                                            )
+                                        onChange={(value) =>
+                                            dispatch({
+                                                type: "UPDATE_MEDIA",
+                                                index: i,
+                                                key: "url",
+                                                value,
+                                            })
                                         }
-                                        className="flex-1 border border-gray-200 p-2 text-sm focus:outline-none focus:border-gray-400"
+                                        className="flex-1"
                                     />
-                                    <input
+                                    <EditInput
                                         placeholder="Alt text"
                                         value={m.alt}
-                                        onChange={(e) =>
-                                            handleMediaChange(
-                                                i,
-                                                "alt",
-                                                e.target.value
-                                            )
+                                        onChange={(value) =>
+                                            dispatch({
+                                                type: "UPDATE_MEDIA",
+                                                index: i,
+                                                key: "alt",
+                                                value,
+                                            })
                                         }
-                                        className="flex-1 border border-gray-200 p-2 text-sm focus:outline-none focus:border-gray-400"
+                                        className="flex-1"
                                     />
                                     <button
-                                        onClick={() => removeMediaItem(i)}
+                                        onClick={() =>
+                                            dispatch({
+                                                type: "REMOVE_MEDIA",
+                                                index: i,
+                                            })
+                                        }
                                         className="text-rose-500 text-sm hover:text-rose-600 cursor-pointer"
                                     >
                                         Remove
@@ -414,7 +451,7 @@ const DetailedCard = ({ venue }) => {
                                 </div>
                             ))}
                             <button
-                                onClick={addMediaItem}
+                                onClick={() => dispatch({ type: "ADD_MEDIA" })}
                                 className="text-sky-500 text-sm hover:text-sky-600 cursor-pointer"
                             >
                                 Add Image
@@ -437,7 +474,11 @@ const DetailedCard = ({ venue }) => {
                                             type="checkbox"
                                             checked={editData.meta[key]}
                                             onChange={() =>
-                                                handleMetaChange(key)
+                                                dispatch({
+                                                    type: "UPDATE_META",
+                                                    key,
+                                                    value: !editData.meta[key],
+                                                })
                                             }
                                         />
                                         <span className="capitalize">
@@ -454,28 +495,27 @@ const DetailedCard = ({ venue }) => {
                             <h3 className="text-sm font-medium text-gray-700">
                                 Location
                             </h3>
-                            {Object.entries(editData.location).map(([f, v]) => (
-                                <div key={f} className="flex flex-col">
-                                    <label className="text-xs capitalize text-gray-600">
-                                        {f}
-                                    </label>
-                                    <input
+                            {Object.entries(editData.location).map(
+                                ([field, value]) => (
+                                    <EditInput
+                                        key={field}
+                                        label={field}
                                         type={
-                                            f === "lat" || f === "lng"
+                                            field === "lat" || field === "lng"
                                                 ? "number"
                                                 : "text"
                                         }
-                                        value={v}
-                                        onChange={(e) =>
-                                            handleLocationChange(
-                                                f,
-                                                e.target.value
-                                            )
+                                        value={value}
+                                        onChange={(value) =>
+                                            dispatch({
+                                                type: "UPDATE_LOCATION",
+                                                field,
+                                                value,
+                                            })
                                         }
-                                        className="border border-gray-200 p-2 text-sm focus:outline-none focus:border-gray-400"
                                     />
-                                </div>
-                            ))}
+                                )
+                            )}
                         </div>
                     ) : (
                         <div className="flex items-start gap-2 text-sm text-gray-600">
@@ -573,6 +613,14 @@ const DetailedCard = ({ venue }) => {
                                 <span className="text-xs text-gray-500">
                                     Max guests: {venue.maxGuests}
                                 </span>
+
+                                {totalNights > 0 && (
+                                    <div className="mt-2 text-lg font-semibold">
+                                        Total ({totalNights} night
+                                        {totalNights > 1 && "s"}): Nok{" "}
+                                        {totalPrice}
+                                    </div>
+                                )}
 
                                 <button
                                     onClick={confirmBooking}

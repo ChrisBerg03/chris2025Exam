@@ -35,7 +35,7 @@ export default function ProfileSection({
 
     const confirmEdit = async () => {
         try {
-            await updateProfile(profile.id, editData);
+            await updateProfile(profile.name, editData);
             setProfile((prev) => ({ ...prev, ...editData }));
             const raw = JSON.parse(localStorage.getItem("user") || "{}");
             raw.profilePic = editData.avatar.url;
@@ -49,7 +49,7 @@ export default function ProfileSection({
     };
 
     return (
-        <div className="mb-8">
+        <div className="space-y-6">
             {isEditing ? (
                 <div className="space-y-6">
                     <h2 className="text-xl font-semibold">Edit Profile</h2>
@@ -85,7 +85,7 @@ export default function ProfileSection({
                             <img
                                 src={editData.avatar.url}
                                 alt={editData.avatar.alt}
-                                className="h-20 w-20 rounded-full object-cover"
+                                className="h-20 w-20 rounded-full object-cover mx-auto sm:mx-0"
                             />
                         )}
                         <label className="text-sm text-gray-600">
@@ -146,6 +146,8 @@ export default function ProfileSection({
                     </div>
                     <div className="flex items-center space-x-2">
                         <input
+                            id="venueManager"
+                            className="cursor-pointer"
                             type="checkbox"
                             checked={editData.venueManager}
                             onChange={(e) =>
@@ -155,21 +157,25 @@ export default function ProfileSection({
                                 )
                             }
                         />
-                        <label className="text-sm text-gray-600">
+                        <label
+                            htmlFor="venueManager"
+                            className="text-sm text-gray-600 cursor-pointer"
+                        >
                             Venue Manager
                         </label>
                     </div>
-                    <div className="flex space-x-2">
+
+                    <div className="flex flex-col sm:flex-row gap-2 w-full">
                         <button
                             onClick={confirmEdit}
-                            className="flex-1 bg-green-500 text-white py-2 rounded flex items-center justify-center space-x-1 cursor-pointer"
+                            className="w-full bg-green-500 text-white py-2 rounded flex items-center justify-center space-x-1 cursor-pointer"
                         >
                             <Save size={16} />
                             <span>Save</span>
                         </button>
                         <button
                             onClick={() => setIsEditing(false)}
-                            className="flex-1 bg-gray-500 text-white py-2 rounded flex items-center justify-center space-x-1 cursor-pointer"
+                            className="w-full bg-gray-500 text-white py-2 rounded flex items-center justify-center space-x-1 cursor-pointer"
                         >
                             <X size={16} />
                             <span>Cancel</span>
@@ -182,20 +188,20 @@ export default function ProfileSection({
                         <img
                             src={profile.banner.url}
                             alt={profile.banner.alt}
-                            className="w-full h-48 object-cover mb-4 rounded"
+                            className="w-full h-40 sm:h-60 object-cover rounded"
                         />
                     )}
-                    <div className="flex justify-between items-center mb-4">
-                        <div className="flex items-center">
+                    <div className="flex flex-wrap items-center sm:justify-between gap-4">
+                        <div className="flex items-center flex-shrink-0 gap-4">
                             {profile.avatar?.url && (
                                 <img
                                     src={profile.avatar.url}
                                     alt={profile.avatar.alt}
-                                    className="h-20 w-20 rounded-full mr-4 object-cover"
+                                    className="h-16 w-16 sm:h-20 sm:w-20 rounded-full object-cover"
                                 />
                             )}
-                            <div>
-                                <h1 className="text-2xl font-semibold">
+                            <div className="text-left">
+                                <h1 className="text-xl sm:text-2xl font-semibold">
                                     {profile.name}
                                 </h1>
                                 <p className="text-gray-600 text-sm">
@@ -205,12 +211,14 @@ export default function ProfileSection({
                         </div>
                         <button
                             onClick={() => setIsEditing(true)}
-                            className="bg-sky-500 hover:bg-sky-600 text-white p-2 rounded flex items-center cursor-pointer"
+                            className="bg-sky-500 hover:bg-sky-600 text-white p-2 rounded flex items-center justify-center mt-2 sm:mt-0 cursor-pointer"
                         >
                             <Edit3 size={16} />
                         </button>
                     </div>
-                    <p className="text-gray-700 mb-4">{profile.bio}</p>
+                    <p className="text-gray-700 leading-relaxed break-words">
+                        {profile.bio}
+                    </p>
                 </>
             )}
         </div>
