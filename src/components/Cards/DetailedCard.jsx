@@ -396,7 +396,7 @@ const DetailedCard = ({ venue }) => {
                             className="w-full h-24 border border-gray-200 p-3 text-gray-700 focus:outline-none focus:border-gray-400"
                         />
                     ) : (
-                        <p className="text-gray-600 text-sm leading-relaxed truncate">
+                        <p className="text-gray-600 text-sm leading-relaxed truncate text-wrap">
                             {venue.description}
                         </p>
                     )}

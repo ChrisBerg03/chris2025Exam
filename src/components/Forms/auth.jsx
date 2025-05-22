@@ -60,7 +60,9 @@ function AuthForm({
             ) : (
                 <>
                     <label className="block mb-2">
-                        <span className="text-gray-700">Name</span>
+                        <span className="text-gray-700">
+                            Name (choose a unique name)
+                        </span>
                         <input
                             type="text"
                             name="name"

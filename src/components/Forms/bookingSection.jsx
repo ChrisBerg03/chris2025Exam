@@ -185,12 +185,12 @@ export default function BookingsSection({ bookings, reloadProfile }) {
                                         {booking.venue.media[0]?.url && (
                                             <img
                                                 src={booking.venue.media[0].url}
-                                                alt={booking.venue.name}
+                                                alt={booking.venue.media[0].alt}
                                                 className="h-14 w-14 rounded object-cover flex-shrink-0"
                                             />
                                         )}
-                                        <div className="min-w-0">
-                                            <span className="font-medium block truncate">
+                                        <div className="min-w-0 max-w-[600px]">
+                                            <span className="font-medium block truncate text-wrap">
                                                 {booking.venue.name}
                                             </span>
                                             <p className="text-sm text-gray-600">
