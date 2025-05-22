@@ -195,13 +195,21 @@ export default function VenuesSection({ venues, reloadProfile }) {
                                     {venue.media[0]?.url && (
                                         <img
                                             src={venue.media[0].url}
-                                            alt={venue.name}
+                                            alt={venue.media[0].alt}
                                             className="h-14 w-14 rounded object-cover flex-shrink-0"
                                         />
                                     )}
-                                    <span className="font-medium truncate">
-                                        {venue.name}
-                                    </span>
+                                    <div>
+                                        <span className="font-medium truncate">
+                                            {venue.name}
+                                        </span>
+                                        <p className="text-sm text-gray-500">
+                                            Price: {venue.price} Nok
+                                        </p>
+                                        <p className="text-sm text-gray-500">
+                                            Max Guests: {venue.maxGuests}
+                                        </p>
+                                    </div>
                                 </Link>
                                 <div className="flex gap-2 mt-2 sm:mt-0">
                                     <button

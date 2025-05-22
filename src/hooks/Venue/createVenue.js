@@ -3,6 +3,7 @@ import { toast } from "react-toastify";
 
 export async function createVenue(data) {
     const rawUser = localStorage.getItem("user");
+    const userName = JSON.parse(rawUser)?.name;
     const token = JSON.parse(rawUser)?.token;
     if (!token) throw new Error("User is not authenticated");
 
@@ -23,6 +24,6 @@ export async function createVenue(data) {
     }
 
     toast.success("Venue was created successfully!");
-
+    window.location.href = `/profile/${userName}`;
     return response.json();
 }

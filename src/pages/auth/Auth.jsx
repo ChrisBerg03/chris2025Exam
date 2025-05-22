@@ -45,10 +45,7 @@ export function Auth() {
         e.preventDefault();
         if (isLogin) {
             try {
-                const response = await login(
-                    loginData.email,
-                    loginData.password
-                );
+                await login(loginData.email, loginData.password);
                 setUser(JSON.parse(localStorage.getItem("user")));
                 navigate("/");
             } catch (error) {
@@ -82,8 +79,7 @@ export function Auth() {
                     }),
                 };
 
-                const response = await register(filteredRegisterData);
-                setIsLogin(true);
+                await register(filteredRegisterData, setIsLogin);
             } catch (error) {
                 console.error("Registration failed:", error.message);
             }

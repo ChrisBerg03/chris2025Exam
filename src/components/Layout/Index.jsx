@@ -7,7 +7,7 @@ import "react-toastify/dist/ReactToastify.css";
 function Layout() {
     return (
         <>
-            <div className="flex flex-col min-h-screen overflow-x-hidden">
+            <div className="flex flex-col min-h-screen overflow-x-hidden bg-[#E6E6EA]">
                 <Header />
                 <ToastContainer
                     position="top-right"
@@ -18,7 +18,7 @@ function Layout() {
                     rtl={false}
                 />
 
-                <main className="grow max-w-[1600px] mx-auto w-full pt-[100px] bg-[#FAF9F6]">
+                <main className="grow max-w-[1600px] mx-auto w-full pt-[100px]">
                     <Outlet />
                 </main>
             </div>

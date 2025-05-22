@@ -207,6 +207,10 @@ export default function ProfileSection({
                                 <p className="text-gray-600 text-sm">
                                     {profile.email}
                                 </p>
+                                <p className="text-gray-600 text-sm">
+                                    Venue Manager:{" "}
+                                    {profile.venueManager ? "✓" : "✗"}{" "}
+                                </p>
                             </div>
                         </div>
                         <button
