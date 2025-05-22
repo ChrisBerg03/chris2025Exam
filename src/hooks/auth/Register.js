@@ -1,7 +1,7 @@
 import { registerUrl } from "../../utility/constants.js";
 import { toast } from "react-toastify";
 
-export async function register(registerData) {
+export async function register(registerData, setIsLogin) {
     try {
         const response = await fetch(registerUrl, {
             method: "POST",
@@ -19,13 +19,10 @@ export async function register(registerData) {
         }
 
         const data = await response.json();
-        toast.success("Registration successful!").then(() => {
-            window.location.reload();
-        });
-
+        toast.success("Registration successful!");
+        setTimeout(() => setIsLogin(true), 1000);
         return data;
     } catch (error) {
-        console.error("Register error:", error.message);
         throw error;
     }
 }

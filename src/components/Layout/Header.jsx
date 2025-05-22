@@ -72,7 +72,7 @@ export function Header() {
     };
 
     return (
-        <header className="fixed top-0 w-full z-50 bg-[#FAF9F6] shadow-md">
+        <header className="fixed top-0 w-full z-50 bg-[#F4F4F8] shadow-md">
             <div className="flex flex-wrap items-center justify-between max-w-[1600px] mx-auto p-4">
                 <div className="flex items-center w-full sm:w-auto justify-between">
                     <Link
@@ -114,7 +114,7 @@ export function Header() {
                                 <img
                                     src={user.profilePic}
                                     alt="Profile"
-                                    className="h-8 w-8 rounded-full"
+                                    className="h-8 w-8 rounded-full object-cover"
                                 />
                             </button>
                         ) : (
@@ -153,7 +153,7 @@ export function Header() {
                 {isHome && (
                     <button
                         onClick={toggleSort}
-                        className="hidden sm:inline-flex mr-4 px-4 py-2 bg-white hover:bg-[#FAF9F6] border text-gray-700 shadow-lg rounded-lg flex items-center gap-1 cursor-pointer"
+                        className="hidden sm:inline-flex mr-4 px-4 py-2 bg-white hover:bg-[#FAF9F6] border text-gray-700 shadow-lg rounded-lg items-center gap-1 cursor-pointer"
                         aria-label={`Sort ${
                             sortOrder === "asc" ? "descending" : "ascending"
                         }`}
@@ -181,7 +181,7 @@ export function Header() {
                                 <img
                                     src={user.profilePic}
                                     alt="Profile"
-                                    className="h-8 w-8 rounded-full"
+                                    className="h-8 w-8 rounded-full object-cover"
                                 />
                             </button>
                             <div
