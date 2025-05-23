@@ -6,8 +6,8 @@ Netlify - https://6830b17f4926e200086c0ebb--zesty-kulfi-aaf8e8.netlify.app/
 ## 🚀 Features
 
 - 🔐 **Authentication**
-  - Sign up / Log in / Log out
-  - Role-based access (e.g., venue host vs. user)
+  - Register / Log in / Log out
+  - Role-based (e.g., venue manager vs. user and customer)
   
 - 🏠 **Venue Management**
   - Create, update, and delete venues
@@ -15,7 +15,7 @@ Netlify - https://6830b17f4926e200086c0ebb--zesty-kulfi-aaf8e8.netlify.app/
 
 - 📅 **Bookings**
   - Book venues with date selection
-  - View upcoming and past bookings
+  - View upcoming bookings
 
 - 🔍 **Search & Filters**
   - Search venues by name or description
