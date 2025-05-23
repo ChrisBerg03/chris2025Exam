@@ -34,7 +34,6 @@ async function createBooking({ dateFrom, dateTo, guests, venueId }) {
 
         return data;
     } catch (error) {
-        console.error("Error creating booking:", error);
         throw error;
     }
 }

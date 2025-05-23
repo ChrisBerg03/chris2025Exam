@@ -47,7 +47,7 @@ export default function VenueForm({
                 </div>
                 <div className="flex-1">
                     <label className="block text-gray-700 mb-2 font-medium">
-                        Price <span className="text-red-500">*</span>
+                        Price (Nok) <span className="text-red-500">*</span>
                     </label>
                     <input
                         type="number"
@@ -182,7 +182,7 @@ export default function VenueForm({
                             <input
                                 type="text"
                                 name="alt"
-                                placeholder="Alt text"
+                                placeholder="Image description"
                                 value={item.alt}
                                 onChange={(e) => handleMediaChange(index, e)}
                                 className="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-400 transition mt-2"

@@ -30,7 +30,6 @@ async function fetchProfile(id) {
 
         return data.data;
     } catch (error) {
-        console.error("Error fetching profile:", error.message);
         throw error;
     }
 }

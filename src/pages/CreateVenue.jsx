@@ -2,7 +2,6 @@ import VenueForm from "../components/Forms/createVenue";
 import { useState } from "react";
 import { createVenue } from "../hooks/Venue/createVenue";
 import { useNavigate } from "react-router-dom";
-import { useContext } from "react";
 
 export function CreateVenue() {
     const rawUser = localStorage.getItem("user");
@@ -73,10 +72,7 @@ export function CreateVenue() {
     const removeMedia = (index) => {
         setFormData((prev) => {
             const newMedia = prev.media.filter((_, i) => i !== index);
-            return {
-                ...prev,
-                media: newMedia.length ? newMedia : [{ url: "", alt: "" }],
-            };
+            return { ...prev, media: newMedia };
         });
     };
 
@@ -85,6 +81,9 @@ export function CreateVenue() {
         try {
             const submissionData = {
                 ...formData,
+                media: formData.media.filter(
+                    (media) => media.url.trim() !== ""
+                ),
                 price: Number(formData.price),
                 maxGuests: Number(formData.maxGuests),
                 rating: Number(formData.rating),
@@ -94,6 +93,19 @@ export function CreateVenue() {
                     lng: Number(formData.location.lng),
                 },
             };
+
+            if (
+                !submissionData.location.address &&
+                !submissionData.location.city &&
+                !submissionData.location.zip &&
+                !submissionData.location.country &&
+                !submissionData.location.continent &&
+                submissionData.location.lat === 0 &&
+                submissionData.location.lng === 0
+            ) {
+                delete submissionData.location;
+            }
+
             await createVenue(submissionData);
             Navigate(`/profile/${name}`);
         } catch (error) {
