@@ -33,7 +33,38 @@ Vercel - https://chris2025-exam-git-main-chris-projects-614842c3.vercel.app/
 
 ---
 
+## Homepage
+- Search for venues
+- Filtering (asc/desc)
+- Displays venues
+- Pagination
+
+## Venue Page
+- View venue details and availability.
+- Book venues
+
+
+## Profile
+- View upcoming bookings
+- View owned venues
+- edit profile
+- Quick edit venues and bookings.
+
+## Manage Bookings
+- View booking details (name, date, guests, price)
+- Delete or edit venues
+
+ ## Authentication
+- Register new users
+- Log in
+
 ## 📦 Setup Instructions
+1. Clone the repository
+git clone https://github.com/ChrisBerg03/chris2025Exam.git
+cd chris2025Exam
 
-1. **Clone the repository**
+2. Install dependencies
+npm install
 
+3. Start the server
+npm run dev
