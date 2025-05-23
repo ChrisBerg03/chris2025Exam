@@ -30,13 +30,16 @@ function AuthForm({
                         />
                     </label>
                     <label className="block mb-4">
-                        <span className="text-gray-700">Password</span>
+                        <span className="text-gray-700">
+                            Password (min 8 characters)
+                        </span>
                         <input
                             type="password"
                             name="password"
                             value={loginData.password}
                             onChange={handleLoginChange}
                             required
+                            min={8}
                             className="mt-1 block w-full border border-gray-300 rounded p-2"
                         />
                     </label>
@@ -73,7 +76,9 @@ function AuthForm({
                         />
                     </label>
                     <label className="block mb-2">
-                        <span className="text-gray-700">Email</span>
+                        <span className="text-gray-700">
+                            Email (Must end with stud.noroff.no)
+                        </span>
                         <input
                             type="email"
                             name="email"
@@ -84,13 +89,16 @@ function AuthForm({
                         />
                     </label>
                     <label className="block mb-2">
-                        <span className="text-gray-700">password</span>
+                        <span className="text-gray-700">
+                            password (min 8 characters)
+                        </span>
                         <input
                             type="password"
                             name="password"
                             value={registerData.password}
                             onChange={handleRegisterChange}
                             required
+                            min={8}
                             className="mt-1 block w-full border border-gray-300 rounded p-2"
                         />
                     </label>
