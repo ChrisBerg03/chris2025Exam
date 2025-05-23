@@ -84,6 +84,7 @@ export default function VenueForm({
                         name="maxGuests"
                         value={formData.maxGuests}
                         onChange={handleChange}
+                        min={1}
                         required
                         className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-400 transition"
                     />
@@ -95,9 +96,9 @@ export default function VenueForm({
                     <input
                         type="number"
                         name="rating"
-                        min="0"
-                        max="5"
-                        step="0.1"
+                        min={0}
+                        max={5}
+                        step="1"
                         value={formData.rating}
                         onChange={handleChange}
                         className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-400 transition"

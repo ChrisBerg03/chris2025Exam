@@ -4,7 +4,7 @@ import { Edit3, Trash2, Save, X } from "lucide-react";
 import { updateVenue } from "../../hooks/Venue/venueEdit";
 import { deleteVenue } from "../../hooks/Venue/venueDelete";
 
-export default function VenuesSection({ venues, reloadProfile }) {
+export default function VenuesSection({ venues, reloadProfile, isOwner }) {
     const [editingId, setEditingId] = useState(null);
     const [editData, setEditData] = useState({
         name: "",
@@ -211,30 +211,36 @@ export default function VenuesSection({ venues, reloadProfile }) {
                                         </p>
                                     </div>
                                 </Link>
-                                <div className="flex gap-2 mt-2 sm:mt-0">
-                                    <button
-                                        onClick={() => {
-                                            setEditingId(venue.id);
-                                            setEditData({
-                                                name: venue.name || "",
-                                                mediaUrl:
-                                                    venue.media[0]?.url || "",
-                                                price: venue.price || 0,
-                                                maxGuests: venue.maxGuests || 1,
-                                            });
-                                            setError(null);
-                                        }}
-                                        className="bg-sky-500 hover:bg-sky-600 text-white px-2 py-1 rounded flex items-center cursor-pointer"
-                                    >
-                                        <Edit3 size={14} />
-                                    </button>
-                                    <button
-                                        onClick={() => handleDelete(venue.id)}
-                                        className="bg-rose-500 hover:bg-rose-600 text-white px-2 py-1 rounded flex items-center cursor-pointer"
-                                    >
-                                        <Trash2 size={14} />
-                                    </button>
-                                </div>
+                                {isOwner && (
+                                    <div className="flex gap-2 mt-2 sm:mt-0">
+                                        <button
+                                            onClick={() => {
+                                                setEditingId(venue.id);
+                                                setEditData({
+                                                    name: venue.name || "",
+                                                    mediaUrl:
+                                                        venue.media[0]?.url ||
+                                                        "",
+                                                    price: venue.price || 0,
+                                                    maxGuests:
+                                                        venue.maxGuests || 1,
+                                                });
+                                                setError(null);
+                                            }}
+                                            className="bg-sky-500 hover:bg-sky-600 text-white px-2 py-1 rounded flex items-center cursor-pointer"
+                                        >
+                                            <Edit3 size={14} />
+                                        </button>
+                                        <button
+                                            onClick={() =>
+                                                handleDelete(venue.id)
+                                            }
+                                            className="bg-rose-500 hover:bg-rose-600 text-white px-2 py-1 rounded flex items-center cursor-pointer"
+                                        >
+                                            <Trash2 size={14} />
+                                        </button>
+                                    </div>
+                                )}
                             </>
                         )}
                     </div>
