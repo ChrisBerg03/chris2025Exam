@@ -6,7 +6,6 @@ Netlify - https://6830b17f4926e200086c0ebb--zesty-kulfi-aaf8e8.netlify.app/
 ## Description
 - You are first met by the home/landing page. From here you have the ability to login/register, search throguh venues and browse thorugh venues using pagination.
 - If you login you gain the ability to open your profile, view other profiles, create venues if you are a venueManager, edit profile/bookings/venues.
--
 - once everything is done you can logout
 
 ## 🚀 Features
