@@ -1,7 +1,7 @@
 # 🏨 Bookings Website
 
 ## Deployment
-Vercel - https://chris2025-exam-git-main-chris-projects-614842c3.vercel.app/
+Netlify - https://6830b17f4926e200086c0ebb--zesty-kulfi-aaf8e8.netlify.app/
 
 ## 🚀 Features
 
