@@ -30,7 +30,6 @@ export async function fetchVenueList(page = 1, query = "", sortOrder = "asc") {
         const data = await response.json();
         return data.data;
     } catch (error) {
-        console.error("Error fetching venue list:", error.message);
         throw error;
     }
 }

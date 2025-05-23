@@ -83,7 +83,7 @@ export function Header() {
                         <img
                             src={logo}
                             alt="Stay and Trip Logo"
-                            className="h-12 w-auto"
+                            className="h-20 w-auto"
                         />
                     </Link>
                     <div className="flex sm:hidden items-center gap-4">

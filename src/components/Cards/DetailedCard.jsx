@@ -425,7 +425,7 @@ const DetailedCard = ({ venue }) => {
                                         className="flex-1"
                                     />
                                     <EditInput
-                                        placeholder="Alt text"
+                                        placeholder="Image description"
                                         value={m.alt}
                                         onChange={(value) =>
                                             dispatch({

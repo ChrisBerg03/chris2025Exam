@@ -114,7 +114,9 @@ function AuthForm({
                         />
                     </label>
                     <label className="block mb-2">
-                        <span className="text-gray-700">Avatar Alt Text</span>
+                        <span className="text-gray-700">
+                            Avatar description
+                        </span>
                         <input
                             type="text"
                             name="avatar.alt"
@@ -134,7 +136,9 @@ function AuthForm({
                         />
                     </label>
                     <label className="block mb-2">
-                        <span className="text-gray-700">Banner Alt Text</span>
+                        <span className="text-gray-700">
+                            Banner description
+                        </span>
                         <input
                             type="text"
                             name="banner.alt"
@@ -152,7 +156,7 @@ function AuthForm({
                             className="mr-2"
                         />
                         <span className="text-gray-700">
-                            Register as Venue Manager
+                            Register as Venue Manager?
                         </span>
                     </label>
                     <button

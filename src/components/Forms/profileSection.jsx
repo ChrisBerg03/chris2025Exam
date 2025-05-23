@@ -89,7 +89,7 @@ export default function ProfileSection({
                             />
                         )}
                         <label className="text-sm text-gray-600">
-                            Avatar Alt Text
+                            Avatar Description
                         </label>
                         <input
                             type="text"
@@ -129,7 +129,7 @@ export default function ProfileSection({
                             />
                         )}
                         <label className="text-sm text-gray-600">
-                            Banner Alt Text
+                            Banner description
                         </label>
                         <input
                             type="text"

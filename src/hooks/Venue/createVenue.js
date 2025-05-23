@@ -16,7 +16,6 @@ export async function createVenue(data) {
 
         body: JSON.stringify(data),
     });
-    console.log(data);
 
     if (!response.ok) {
         toast.error("Failed to create venue");
