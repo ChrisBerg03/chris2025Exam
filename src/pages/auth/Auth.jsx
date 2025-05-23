@@ -4,6 +4,7 @@ import { login } from "../../hooks/auth/Login";
 import { register } from "../../hooks/auth/Register";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../../utility/UserContext";
+import { toast } from "react-toastify";
 
 export function Auth() {
     const [isLogin, setIsLogin] = useState(true);
@@ -20,6 +21,8 @@ export function Auth() {
 
     const { setUser } = useContext(UserContext);
     const navigate = useNavigate();
+
+    const emailRegex = /^[^\s@]+@stud\.noroff\.no$/;
 
     const handleLoginChange = (e) => {
         const { name, value } = e.target;
@@ -43,6 +46,13 @@ export function Auth() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        const email = isLogin ? loginData.email : registerData.email;
+
+        if (!emailRegex.test(email)) {
+            toast.error("Email must end with stud.noroff.no");
+            return;
+        }
+
         if (isLogin) {
             try {
                 await login(loginData.email, loginData.password);
