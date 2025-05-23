@@ -409,7 +409,7 @@ const DetailedCard = ({ venue }) => {
                             {editData.media.map((m, i) => (
                                 <div
                                     key={i}
-                                    className="flex gap-2 items-center"
+                                    className="flex gap-2 items-center flex-wrap"
                                 >
                                     <EditInput
                                         placeholder="Image URL"
