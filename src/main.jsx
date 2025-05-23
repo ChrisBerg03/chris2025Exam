@@ -40,9 +40,7 @@ const routes = createBrowserRouter([
 ]);
 
 createRoot(document.getElementById("root")).render(
-    <StrictMode>
-        <UserProvider>
-            <RouterProvider router={routes} />
-        </UserProvider>
-    </StrictMode>
+    <UserProvider>
+        <RouterProvider router={routes} />
+    </UserProvider>
 );
