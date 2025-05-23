@@ -2,8 +2,12 @@ import VenueForm from "../components/Forms/createVenue";
 import { useState } from "react";
 import { createVenue } from "../hooks/Venue/createVenue";
 import { useNavigate } from "react-router-dom";
+import { useContext } from "react";
 
 export function CreateVenue() {
+    const rawUser = localStorage.getItem("user");
+    const name = JSON.parse(rawUser || "{}").name;
+
     const Navigate = useNavigate();
     const [formData, setFormData] = useState({
         name: "",
@@ -91,7 +95,7 @@ export function CreateVenue() {
                 },
             };
             await createVenue(submissionData);
-            Navigate(`/profile/${formData.name}`);
+            Navigate(`/profile/${name}`);
         } catch (error) {
             console.error("Submission error:", error);
         }

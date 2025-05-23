@@ -37,6 +37,7 @@ export default function ProfileCard({ id }) {
                 <VenuesSection
                     id={id}
                     venues={profile.venues}
+                    isOwner={isOwner}
                     reloadProfile={() => fetchProfile(id).then(setProfile)}
                 />
             )}
